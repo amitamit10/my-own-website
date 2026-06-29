@@ -47,11 +47,11 @@ console.log(`[rembg] using ${REMBG_BIN}`);
 
 // ── Persistent rembg HTTP server (keeps the 176MB model in memory between uploads) ──
 const REMBG_PORT = parseInt(process.env.REMBG_PORT || '5000', 10);
-const REMBG_URL = `http://127.0.0.1:${REMBG_PORT}/api/remove`;
+const REMBG_URL = `http://127.0.0.1:${REMBG_PORT}/api/remove?model=u2netp`;
 let rembgProc = null;
 
 function startRembgServer() {
-  rembgProc = spawn(REMBG_BIN, ['s', '--host', '127.0.0.1', '--port', String(REMBG_PORT), '--no-ui', '--model', 'u2netp'], {
+  rembgProc = spawn(REMBG_BIN, ['s', '--host', '127.0.0.1', '--port', String(REMBG_PORT), '--no-ui'], {
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   rembgProc.stdout.on('data', d => {
@@ -194,7 +194,7 @@ app.listen(PORT, '0.0.0.0', () => {
         const tiny1x1 = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
         const warmForm = new FormData();
         warmForm.append('file', new Blob([tiny1x1], { type: 'image/png' }), 'warm.png');
-        await fetch(REMBG_URL, { method: 'POST', body: warmForm }).catch(() => {});
+        await fetch(`http://127.0.0.1:${REMBG_PORT}/api/remove?model=u2netp`, { method: 'POST', body: warmForm }).catch(() => {});
         console.log('[rembg] model pre-warmed — first upload will be fast');
       })
       .catch(err => console.error('[rembg] startup error:', err.message));
