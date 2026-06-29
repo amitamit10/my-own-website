@@ -1,131 +1,109 @@
 #!/usr/bin/env python3
 """
-fix-letters.py — Auto-fix water-font letter PNGs in tools/font-maker/letters/.
+fix-letters.py — Erase stray attached blobs from water-font letter PNGs.
 
-Removes small detached blobs (connected components smaller than MIN_BLOB_PX²)
-that are not the main glyph body. These would otherwise render as unwanted
-black dots when the font is rasterised in solid black.
+Strategy: for each letter marked "Manually fixable: Yes" in
+tools/font-maker/letter-notes.md, use morphological erosion with a cross-shaped
+kernel to break the thin necks that connect stray drops to the main glyph body,
+then run connected-component analysis. The single largest component is
+identified as the main glyph body, dilated back to its original size, and
+intersected with the original alpha mask. Everything else (stray drops that
+were broken off by erosion) is erased.
 
-Safe to re-run (idempotent). A blob that has already been removed stays
-removed; a glyph that has no extra blobs is left untouched.
-
-Usage:
-    python3 tools/font-maker/fix-letters.py
+Usage:  python3 tools/font-maker/fix-letters.py
 """
 
-from __future__ import annotations
-
-import sys
+import re
 from pathlib import Path
 
 import numpy as np
 from PIL import Image
 from scipy import ndimage
 
-# --- config -----------------------------------------------------------------
-
-LETTERS_DIR = Path(__file__).resolve().parent / "letters"
-
-# Glyphs to process, in render order.
-GLYPHS = [chr(c) for c in range(ord("A"), ord("Z") + 1)] + [str(d) for d in range(10)]
-
-# A blob must be at least this many pixels-squared to be considered part of
-# the main glyph. Anything smaller is treated as a stray droplet.
-#
-# Threshold rationale: across the 36 glyphs the smallest main body is ~70k
-# px² and the largest genuine non-main sub-component is the 5's bowl-tail
-# at ~2.7k px². Setting MIN_BLOB_PX2 = 1500 safely erases stray drops
-# (I: 1079, W: 626, etc.) while preserving all real letter parts.
-MIN_BLOB_PX2 = 1500
-
-# Alpha threshold — anything above this is "opaque enough" to count as glyph.
-ALPHA_THRESHOLD = 10
+ROOT = Path(__file__).resolve().parent
+LETTERS_DIR = ROOT / "letters"
+NOTES_PATH = ROOT / "letter-notes.md"
+EROSION_ITERATIONS = 5  # cross-shaped kernel iterations to break thin necks
 
 
-# --- core -------------------------------------------------------------------
+def parse_fixable_letters(notes_text: str) -> list[str]:
+    """Return the list of letter IDs (e.g. 'A', '0') marked fixable."""
+    fixable: list[str] = []
+    for match in re.finditer(
+        r"^##\s+(\S+)\s+—\s+NEEDS WORK\s*\n"
+        r"(?:.*?\n)*?"
+        r"\*\*Manually fixable:\*\*\s*Yes",
+        notes_text,
+        flags=re.MULTILINE,
+    ):
+        fixable.append(match.group(1))
+    return fixable
 
-def fix_letter(path: Path) -> dict:
-    """Remove stray blobs from a single letter PNG. Returns a summary dict."""
+
+def fix_letter(letter_id: str) -> dict:
+    """Erase stray blobs from a single letter PNG. Returns a summary dict."""
+    path = LETTERS_DIR / f"{letter_id}.png"
     img = Image.open(path).convert("RGBA")
     arr = np.array(img)
 
-    alpha = arr[:, :, 3] > ALPHA_THRESHOLD
-    if not alpha.any():
-        return {"name": path.stem, "status": "empty", "removed": 0, "kept": 0}
+    alpha = arr[:, :, 3] > 10
+    original_count = int(np.sum(alpha))
 
-    labeled, n_components = ndimage.label(alpha)
-    if n_components <= 1:
-        return {"name": path.stem, "status": "clean", "removed": 0, "kept": n_components}
+    # Erode with a cross-shaped kernel to break thin necks connecting stray
+    # drops to the main body. 5 iterations is enough to break necks up to
+    # ~5 px wide while leaving the thick main body largely intact.
+    eroded = ndimage.binary_erosion(alpha, iterations=EROSION_ITERATIONS)
 
-    sizes = ndimage.sum(alpha, labeled, range(1, n_components + 1))
+    labeled, n_components = ndimage.label(eroded)
+
+    if n_components == 0:
+        return {"letter": letter_id, "removed": 0, "kept": original_count}
+
+    sizes = ndimage.sum(eroded, labeled, range(1, n_components + 1))
     main_label = int(np.argmax(sizes)) + 1
-    main_size = float(sizes[main_label - 1])
+    main_core = labeled == main_label
 
-    removed = 0
-    kept = 1  # the main body
-    for i, size in enumerate(sizes, start=1):
-        if i == main_label:
-            continue
-        if size < MIN_BLOB_PX2:
-            arr[labeled == i, 3] = 0
-            removed += 1
-        else:
-            kept += 1
+    # Dilate the main core back to roughly the original size.
+    main_clean = ndimage.binary_dilation(main_core, iterations=EROSION_ITERATIONS)
 
-    if removed:
+    # Final mask = original alpha AND cleaned main body. Everything else
+    # (stray drops that were broken off by erosion) is erased.
+    new_alpha = alpha & main_clean
+    removed_count = original_count - int(np.sum(new_alpha))
+
+    if removed_count > 0:
+        arr[:, :, 3] = np.where(new_alpha, arr[:, :, 3], 0)
         Image.fromarray(arr).save(path)
 
     return {
-        "name": path.stem,
-        "status": "fixed" if removed else "clean",
-        "removed": removed,
-        "kept": kept,
-        "main_size": int(main_size),
+        "letter": letter_id,
+        "removed": removed_count,
+        "kept": int(np.sum(new_alpha)),
     }
 
 
-def main() -> int:
-    if not LETTERS_DIR.is_dir():
-        print(f"letters directory not found: {LETTERS_DIR}", file=sys.stderr)
-        return 1
+def main() -> None:
+    notes_text = NOTES_PATH.read_text()
+    fixable = parse_fixable_letters(notes_text)
+    print(f"Found {len(fixable)} fixable letters: {', '.join(fixable)}\n")
 
     results: list[dict] = []
-    for glyph in GLYPHS:
-        path = LETTERS_DIR / f"{glyph}.png"
-        if not path.exists():
-            results.append({"name": glyph, "status": "missing", "removed": 0, "kept": 0})
-            continue
-        results.append(fix_letter(path))
-
-    # --- summary ------------------------------------------------------------
-
-    fixed = [r for r in results if r["status"] == "fixed"]
-    clean = [r for r in results if r["status"] == "clean"]
-    missing = [r for r in results if r["status"] == "missing"]
-    empty = [r for r in results if r["status"] == "empty"]
+    for letter_id in fixable:
+        result = fix_letter(letter_id)
+        results.append(result)
+        removed = result["removed"]
+        if removed:
+            print(f"  {letter_id}: erased {removed} px of stray pixels")
+        else:
+            print(f"  {letter_id}: unchanged (no stray pixels found)")
 
     total_removed = sum(r["removed"] for r in results)
-
-    print(f"Processed {len(results)} glyphs in {LETTERS_DIR}")
-    print(f"  Fixed (blobs removed): {len(fixed)}")
-    print(f"  Already clean:         {len(clean)}")
-    if missing:
-        print(f"  Missing files:         {len(missing)}  -> {[r['name'] for r in missing]}")
-    if empty:
-        print(f"  Empty glyphs:          {len(empty)}  -> {[r['name'] for r in empty]}")
-    print(f"  Total stray blobs erased: {total_removed}")
-    print()
-
-    if fixed:
-        print("Per-glyph detail (fixed only):")
-        for r in fixed:
-            print(
-                f"  {r['name']}: erased {r['removed']} stray blob(s); "
-                f"main body = {r['main_size']} px²; {r['kept']} large component(s) kept"
-            )
-
-    return 0
+    changed = sum(1 for r in results if r["removed"] > 0)
+    print(
+        f"\nDone. {total_removed} stray pixels erased across {changed} of "
+        f"{len(results)} letter(s)."
+    )
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

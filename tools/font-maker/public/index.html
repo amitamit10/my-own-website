@@ -8,7 +8,8 @@
 </head>
 <body>
   <div id="letter">A</div>
-  <p id="instruction">Form this letter with water, then tap capture.</p>
+  <p id="instruction">Re-photograph this letter, then tap capture.</p>
+  <p id="mode-badge">Retry Mode</p>
   <button id="capture-btn">📸 Capture</button>
   <input type="file" id="file-input" accept="image/*" capture="environment" />
   <div id="preview" hidden>
@@ -25,16 +26,18 @@
     </div>
     <button id="next-btn">Next letter →</button>
   </div>
-  <p id="status-msg"></p>
+  <p id="status-msg" aria-live="polite" aria-atomic="true"></p>
   <p id="progress"></p>
+  <p id="queue-label"></p>
   <p id="done-list"></p>
-  <button id="reset-btn" class="reset-corner" title="Delete all captured letters">🗑 Reset all</button>
+  <button id="reset-btn" class="reset-corner" title="Restart the retry list">↺ Restart retry list</button>
 
   <script>
-    const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
     const letterEl = document.getElementById('letter');
+    const modeBadgeEl = document.getElementById('mode-badge');
     const statusEl = document.getElementById('status-msg');
     const progressEl = document.getElementById('progress');
+    const queueLabelEl = document.getElementById('queue-label');
     const doneEl = document.getElementById('done-list');
     const btn = document.getElementById('capture-btn');
     const fileInput = document.getElementById('file-input');
@@ -47,19 +50,35 @@
     const resultImg = document.getElementById('result-img');
     const resultLabel = document.getElementById('result-label');
     const nextBtn = document.getElementById('next-btn');
+    let targets = [];
     let current = null;
 
+    async function loadConfig() {
+      const config = await fetch('/config').then(r => r.json());
+      targets = config.targets || [];
+      modeBadgeEl.textContent = config.mode === 'retry' ? 'Retry Mode' : 'Capture Mode';
+      resetBtn.textContent = config.resetLabel || 'Reset';
+      resetBtn.title = config.resetDescription || 'Reset progress';
+    }
+
     async function loadStatus() {
-      const { done, remaining } = await fetch('/status').then(r => r.json());
+      const { done, remaining, mode } = await fetch('/status').then(r => r.json());
       current = remaining[0] || null;
       letterEl.textContent = current || '✓';
-      progressEl.textContent = `${done.length}/${CHARS.length} captured`;
-      doneEl.textContent = done.length ? `Done: ${done.join(' ')}` : '';
+      progressEl.textContent = `${done.length}/${targets.length} retry letters updated`;
+      queueLabelEl.textContent = remaining.length ? `Still to retake: ${remaining.join(' ')}` : 'Retry queue complete.';
+      doneEl.textContent = done.length ? `Updated: ${done.join(' ')}` : 'Updated: none yet';
       btn.disabled = !current;
       btn.hidden = false;
       preview.hidden = true;
       resultPreview.hidden = true;
-      if (!current) statusEl.textContent = 'All letters captured!';
+      if (!current) {
+        statusEl.textContent = mode === 'retry'
+          ? 'All retry letters updated.'
+          : 'All letters captured!';
+      } else {
+        statusEl.textContent = '';
+      }
     }
 
     function compressImage(file, maxPx = 1024, quality = 0.85) {
@@ -138,12 +157,17 @@
     nextBtn.addEventListener('click', () => loadStatus());
 
     resetBtn.addEventListener('click', async () => {
-      if (!confirm('Delete all captured letters? This cannot be undone.')) return;
+      if (!confirm('Restart the retry list? This keeps your saved PNGs and lets you re-photograph the retry letters again.')) return;
       await fetch('/reset', { method: 'POST' });
       loadStatus();
     });
 
-    loadStatus();
+    async function init() {
+      await loadConfig();
+      await loadStatus();
+    }
+
+    init();
   </script>
 </body>
 </html>

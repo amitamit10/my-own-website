@@ -6,15 +6,37 @@ const fs = require('fs');
 const os = require('os');
 const crypto = require('crypto');
 const { execSync, spawn } = require('child_process');
+const {
+  createRetryState,
+  normalizeState,
+  getRetryStatus,
+  markCompleted,
+} = require('./retry-mode');
 
 const app = express();
 const PORT = process.env.PORT || 3333;
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 const LETTERS_DIR = path.join(__dirname, 'letters');
+const RETRY_STATE_PATH = path.join(UPLOADS_DIR, 'retry-state.json');
 
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 fs.mkdirSync(LETTERS_DIR, { recursive: true });
+
+function loadRetryState() {
+  try {
+    const raw = fs.readFileSync(RETRY_STATE_PATH, 'utf8');
+    return normalizeState(JSON.parse(raw));
+  } catch {
+    return createRetryState();
+  }
+}
+
+function saveRetryState(state) {
+  fs.writeFileSync(RETRY_STATE_PATH, JSON.stringify(normalizeState(state), null, 2));
+}
+
+saveRetryState(loadRetryState());
 
 // ── Locate rembg binary at startup (auto-detect, no machine-specific hardcoding) ──
 function findRembgBin() {
@@ -106,10 +128,25 @@ const upload = multer({
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/letters', express.static(LETTERS_DIR));
 
+app.get('/config', (req, res) => {
+  const status = getRetryStatus(loadRetryState());
+  res.json({
+    mode: status.mode,
+    targets: status.targets,
+    total: status.targets.length,
+    resetLabel: 'Restart retry list',
+    resetDescription: 'Start the retry queue over without deleting any saved PNGs.',
+  });
+});
+
 app.get('/status', (req, res) => {
-  const done = CHARS.filter(c => fs.existsSync(path.join(LETTERS_DIR, `${c}.png`)));
-  const remaining = CHARS.filter(c => !done.includes(c));
-  res.json({ done, remaining });
+  const retryStatus = getRetryStatus(loadRetryState());
+  res.json({
+    done: retryStatus.done,
+    remaining: retryStatus.remaining,
+    mode: retryStatus.mode,
+    targets: retryStatus.targets,
+  });
 });
 
 app.post('/upload', upload.single('photo'), async (req, res) => {
@@ -144,6 +181,7 @@ app.post('/upload', upload.single('photo'), async (req, res) => {
       return res.json({ ok: false, error: `rembg failed: ${rembgErr.message}` });
     }
     fs.writeFileSync(outPath, outBuffer);
+    saveRetryState(markCompleted(loadRetryState(), char));
     try { fs.unlinkSync(rawPath); } catch {}
     res.json({ ok: true });
   } catch (err) {
@@ -154,16 +192,9 @@ app.post('/upload', upload.single('photo'), async (req, res) => {
 
 app.post('/reset', (req, res) => {
   try {
-    const files = fs.readdirSync(LETTERS_DIR);
-    let deleted = 0;
-    for (const f of files) {
-      if (f.toLowerCase().endsWith('.png') && f !== '.gitkeep') {
-        fs.unlinkSync(path.join(LETTERS_DIR, f));
-        deleted++;
-      }
-    }
-    console.log(`[reset] deleted ${deleted} letter(s)`);
-    res.json({ ok: true, deleted });
+    saveRetryState(createRetryState());
+    console.log('[reset] retry progress cleared');
+    res.json({ ok: true, reset: 'retry-progress' });
   } catch (err) {
     res.json({ ok: false, error: err.message });
   }

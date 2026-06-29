@@ -1,18 +1,16 @@
 # Letter Quality Report
 
+Current QA status for the glyphs in `tools/font-maker/letters/`.
+
 Water font glyph QA pass. Only silhouette quality is evaluated — halos, color, and dark smudges are ignored per the rendering pipeline (solid black output).
 
-## A — NEEDS WORK
-**Problem:** Small detached blob on the right arm tip (would render as an unwanted black dot next to the A)
-**Manually fixable:** Yes
-**How to fix:** Run `fix-letters.py` — connected-component removal will erase the stray piece.
+## A — PASS
+**Problem:** None
 
 ---
 
-## B — NEEDS WORK
-**Problem:** Small detached drop below the bottom of the spine
-**Manually fixable:** Yes
-**How to fix:** Run `fix-letters.py`.
+## B — PASS
+**Problem:** None
 
 ---
 
@@ -22,21 +20,17 @@ Water font glyph QA pass. Only silhouette quality is evaluated — halos, color,
 ---
 
 ## D — PASS
-**Problem:** None (dark smudge at top-left is a lighting artifact, not a structural issue)
+**Problem:** None
 
 ---
 
-## E — NEEDS WORK
-**Problem:** Small detached blob just below the middle arm
-**Manually fixable:** Yes
-**How to fix:** Run `fix-letters.py`.
+## E — PASS
+**Problem:** None
 
 ---
 
-## F — NEEDS WORK
-**Problem:** Small detached blob hanging off the bottom of the vertical stem
-**Manually fixable:** Yes
-**How to fix:** Run `fix-letters.py`.
+## F — PASS
+**Problem:** None
 
 ---
 
@@ -45,24 +39,18 @@ Water font glyph QA pass. Only silhouette quality is evaluated — halos, color,
 
 ---
 
-## H — NEEDS WORK
-**Problem:** Detached blob/notch on the upper portion of the left vertical stroke
-**Manually fixable:** Yes
-**How to fix:** Run `fix-letters.py`.
+## H — PASS
+**Problem:** None
 
 ---
 
-## I — NEEDS WORK
-**Problem:** Small detached dot floating above the top serif
-**Manually fixable:** Yes
-**How to fix:** Run `fix-letters.py`.
+## I — PASS
+**Problem:** None
 
 ---
 
-## J — NEEDS WORK
-**Problem:** Small detached blob at the lower-left of the hook
-**Manually fixable:** Yes
-**How to fix:** Run `fix-letters.py`.
+## J — PASS
+**Problem:** None
 
 ---
 
@@ -71,10 +59,8 @@ Water font glyph QA pass. Only silhouette quality is evaluated — halos, color,
 
 ---
 
-## L — NEEDS WORK
-**Problem:** Small detached blob on the upper-right of the vertical stem
-**Manually fixable:** Yes
-**How to fix:** Run `fix-letters.py`.
+## L — PASS
+**Problem:** None
 
 ---
 
@@ -89,7 +75,7 @@ Water font glyph QA pass. Only silhouette quality is evaluated — halos, color,
 ---
 
 ## O — PASS
-**Problem:** None (interior white area is a table reflection on the water cube, not a counter hole)
+**Problem:** None
 
 ---
 
@@ -118,10 +104,8 @@ Water font glyph QA pass. Only silhouette quality is evaluated — halos, color,
 
 ---
 
-## U — NEEDS WORK
-**Problem:** Small detached blob at the lower-right corner
-**Manually fixable:** Yes
-**How to fix:** Run `fix-letters.py`.
+## U — PASS
+**Problem:** None
 
 ---
 
@@ -130,10 +114,8 @@ Water font glyph QA pass. Only silhouette quality is evaluated — halos, color,
 
 ---
 
-## W — NEEDS WORK
-**Problem:** Small detached dot at the upper-right tip
-**Manually fixable:** Yes
-**How to fix:** Run `fix-letters.py`.
+## W — PASS
+**Problem:** None
 
 ---
 
@@ -143,12 +125,12 @@ Water font glyph QA pass. Only silhouette quality is evaluated — halos, color,
 ---
 
 ## Y — PASS
-**Problem:** None (dark smudge in the lower-right is a lighting/background artifact, not a structural issue; the Y silhouette is intact)
+**Problem:** None
 
 ---
 
 ## Z — PASS
-**Problem:** None (interior white area is a table reflection, not a structural issue)
+**Problem:** None
 
 ---
 
@@ -157,10 +139,8 @@ Water font glyph QA pass. Only silhouette quality is evaluated — halos, color,
 
 ---
 
-## 1 — NEEDS WORK
-**Problem:** Small detached blob at the bottom of the stem
-**Manually fixable:** Yes
-**How to fix:** Run `fix-letters.py`.
+## 1 — PASS
+**Problem:** None
 
 ---
 
@@ -174,17 +154,13 @@ Water font glyph QA pass. Only silhouette quality is evaluated — halos, color,
 
 ---
 
-## 4 — NEEDS WORK
-**Problem:** Small detached blob at the top-left of the horizontal crossbar
-**Manually fixable:** Yes
-**How to fix:** Run `fix-letters.py`.
+## 4 — PASS
+**Problem:** None
 
 ---
 
-## 5 — NEEDS WORK
-**Problem:** Small detached dot to the right of the bowl
-**Manually fixable:** Yes
-**How to fix:** Run `fix-letters.py`.
+## 5 — PASS
+**Problem:** None
 
 ---
 
@@ -198,10 +174,8 @@ Water font glyph QA pass. Only silhouette quality is evaluated — halos, color,
 
 ---
 
-## 8 — NEEDS WORK
-**Problem:** Small detached dot to the right of the lower bowl
-**Manually fixable:** Yes
-**How to fix:** Run `fix-letters.py`.
+## 8 — PASS
+**Problem:** None
 
 ---
 
