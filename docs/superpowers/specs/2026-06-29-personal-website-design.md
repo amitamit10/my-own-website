@@ -80,10 +80,16 @@ content/
 
 ---
 
-## Sub-Projects (build order)
+## Phases (build order)
 
-1. **Font Maker Tool** — `tools/font-maker/` — standalone Next.js or Node app; phone server + background removal + letter storage
-2. **Portfolio Site** — main Next.js app with all sections, MDX content, GitHub API, Groq blog generation
+| Phase | Name | Goal |
+|---|---|---|
+| 1 | Font Maker Tool | Phone camera server + background removal + letter PNG storage |
+| 2 | Site Foundation | Next.js scaffold, Tailwind, Vercel config, MDX, layout, custom font |
+| 3 | Core Sections | Hero, About/Strengths, Projects grid, Contact |
+| 4 | GitHub Activity | Live GitHub API — contribution graph + recent repos |
+| 5 | AI Blog Generation | Groq integration, generate-post script, blog page, draft/publish flow |
+| 6 | Polish & Deploy | Animations, ripple/particle effects, performance, production Vercel deploy |
 
 ---
 
