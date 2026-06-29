@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Visually inspect water letter PNGs for font quality and write findings to letter-notes.md
+description: Inspect water letter PNGs for shape quality, write a report to letter-notes.md, then auto-fix all manually fixable letters using Python + Pillow
 options:
   displayName: Letter QA & Fixer
   id: letter-reviewer
