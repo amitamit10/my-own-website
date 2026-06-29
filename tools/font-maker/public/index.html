@@ -11,9 +11,17 @@
   <p id="instruction">Form this letter with water, then tap capture.</p>
   <button id="capture-btn">📸 Capture</button>
   <input type="file" id="file-input" accept="image/*" capture="environment" />
+  <div id="preview" hidden>
+    <img id="preview-img" alt="Captured photo preview" />
+    <div class="preview-buttons">
+      <button id="use-photo-btn" class="primary">✓ Use this photo</button>
+      <button id="retake-btn">↻ Retake</button>
+    </div>
+  </div>
   <p id="status-msg"></p>
   <p id="progress"></p>
   <p id="done-list"></p>
+  <button id="reset-btn" class="reset-corner" title="Delete all captured letters">🗑 Reset all</button>
 
   <script>
     const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
@@ -23,6 +31,11 @@
     const doneEl = document.getElementById('done-list');
     const btn = document.getElementById('capture-btn');
     const fileInput = document.getElementById('file-input');
+    const preview = document.getElementById('preview');
+    const previewImg = document.getElementById('preview-img');
+    const usePhotoBtn = document.getElementById('use-photo-btn');
+    const retakeBtn = document.getElementById('retake-btn');
+    const resetBtn = document.getElementById('reset-btn');
     let current = null;
 
     async function loadStatus() {
@@ -32,15 +45,16 @@
       progressEl.textContent = `${done.length}/${CHARS.length} captured`;
       doneEl.textContent = done.length ? `Done: ${done.join(' ')}` : '';
       btn.disabled = !current;
+      btn.hidden = false;
+      preview.hidden = true;
       if (!current) statusEl.textContent = 'All letters captured!';
     }
 
-    btn.addEventListener('click', () => fileInput.click());
-
-    fileInput.addEventListener('change', async () => {
+    async function uploadCurrentPhoto() {
       const file = fileInput.files[0];
       if (!file || !current) return;
       btn.disabled = true;
+      usePhotoBtn.disabled = true;
       statusEl.textContent = 'Uploading…';
       const form = new FormData();
       form.append('char', current);
@@ -55,6 +69,37 @@
         btn.disabled = false;
       }
       fileInput.value = '';
+      usePhotoBtn.disabled = false;
+    }
+
+    btn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (!file || !current) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        previewImg.src = reader.result;
+        preview.hidden = false;
+        btn.hidden = true;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    usePhotoBtn.addEventListener('click', uploadCurrentPhoto);
+
+    retakeBtn.addEventListener('click', () => {
+      preview.hidden = true;
+      previewImg.src = '';
+      btn.hidden = false;
+      fileInput.value = '';
+      fileInput.click();
+    });
+
+    resetBtn.addEventListener('click', async () => {
+      if (!confirm('Delete all captured letters? This cannot be undone.')) return;
+      await fetch('/reset', { method: 'POST' });
+      loadStatus();
     });
 
     loadStatus();

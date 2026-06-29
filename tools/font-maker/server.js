@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const crypto = require('crypto');
-const { execSync, execFileSync } = require('child_process');
+const { execSync, spawn } = require('child_process');
 
 const app = express();
 const PORT = process.env.PORT || 3333;
@@ -45,6 +45,53 @@ if (!REMBG_BIN) {
 }
 console.log(`[rembg] using ${REMBG_BIN}`);
 
+// ── Persistent rembg HTTP server (keeps the 176MB model in memory between uploads) ──
+const REMBG_PORT = parseInt(process.env.REMBG_PORT || '5000', 10);
+const REMBG_URL = `http://127.0.0.1:${REMBG_PORT}/api/remove`;
+let rembgProc = null;
+
+function startRembgServer() {
+  rembgProc = spawn(REMBG_BIN, ['s', '--host', '127.0.0.1', '--port', String(REMBG_PORT), '--no-ui'], {
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  rembgProc.stdout.on('data', d => {
+    const msg = d.toString().trim();
+    if (msg) console.log(`[rembg] ${msg}`);
+  });
+  rembgProc.stderr.on('data', d => {
+    const msg = d.toString().trim();
+    if (msg) console.error(`[rembg] ${msg}`);
+  });
+  rembgProc.on('exit', code => {
+    if (code !== 0 && code !== null) {
+      console.error(`[rembg] server exited with code ${code}, restarting in 2s...`);
+      setTimeout(startRembgServer, 2000);
+    }
+  });
+}
+
+function killRembgServer() {
+  if (rembgProc && !rembgProc.killed) {
+    try { rembgProc.kill(); } catch {}
+  }
+}
+
+process.on('exit', killRembgServer);
+process.on('SIGINT', () => { killRembgServer(); process.exit(0); });
+process.on('SIGTERM', () => { killRembgServer(); process.exit(0); });
+
+async function waitForRembgServer(timeoutMs = 30000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    try {
+      const res = await fetch(REMBG_URL.replace('/api/remove', '/api/health'), { method: 'GET' });
+      if (res.ok) return;
+    } catch {}
+    await new Promise(r => setTimeout(r, 500));
+  }
+  throw new Error('rembg server failed to start within 30s');
+}
+
 // ── Use memoryStorage so the route handler can write the file AFTER multer fully parses the body ──
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -59,7 +106,7 @@ app.get('/status', (req, res) => {
   res.json({ done, remaining });
 });
 
-app.post('/upload', upload.single('photo'), (req, res) => {
+app.post('/upload', upload.single('photo'), async (req, res) => {
   let rawPath = null;
   try {
     const char = (req.body.char || '').toUpperCase();
@@ -76,19 +123,21 @@ app.post('/upload', upload.single('photo'), (req, res) => {
     fs.writeFileSync(rawPath, req.file.buffer);
 
     const outPath = path.join(LETTERS_DIR, `${char}.png`);
-    let stdout = '';
+    let outBuffer;
     try {
-      stdout = execFileSync(REMBG_BIN, ['i', rawPath, outPath], { stdio: ['ignore', 'pipe', 'pipe'] }).toString();
-      if (stdout.trim()) console.log(`[rembg] ${char}: ${stdout.trim()}`);
+      const form = new FormData();
+      form.append('file', new Blob([req.file.buffer], { type: req.file.mimetype || 'image/jpeg' }), req.file.originalname || 'photo.jpg');
+      const res = await fetch(REMBG_URL, { method: 'POST', body: form });
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`rembg server returned ${res.status}: ${errText.slice(0, 200)}`);
+      }
+      outBuffer = Buffer.from(await res.arrayBuffer());
     } catch (rembgErr) {
-      const stderr = rembgErr.stderr ? rembgErr.stderr.toString() : '(no stderr captured)';
-      const out = rembgErr.stdout ? rembgErr.stdout.toString() : '';
       try { fs.unlinkSync(rawPath); } catch {}
-      return res.json({
-        ok: false,
-        error: `rembg failed (exit ${rembgErr.status || '?'}): ${(stderr + out).trim() || rembgErr.message}`,
-      });
+      return res.json({ ok: false, error: `rembg failed: ${rembgErr.message}` });
     }
+    fs.writeFileSync(outPath, outBuffer);
     try { fs.unlinkSync(rawPath); } catch {}
     res.json({ ok: true });
   } catch (err) {
@@ -97,26 +146,22 @@ app.post('/upload', upload.single('photo'), (req, res) => {
   }
 });
 
-// ── Warm the rembg model cache at startup so the first user upload is fast ──
-function warmRembg() {
-  const warmPath = path.join(UPLOADS_DIR, '_warmup.png');
-  const warmOut = path.join(UPLOADS_DIR, '_warmup_out.png');
+app.post('/reset', (req, res) => {
   try {
-    // 1x1 PNG (smallest possible valid PNG, 67 bytes)
-    const tinyPng = Buffer.from(
-      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
-      'base64',
-    );
-    fs.writeFileSync(warmPath, tinyPng);
-    execFileSync(REMBG_BIN, ['i', warmPath, warmOut], { stdio: 'ignore' });
-    console.log('[rembg] model warmed');
+    const files = fs.readdirSync(LETTERS_DIR);
+    let deleted = 0;
+    for (const f of files) {
+      if (f.toLowerCase().endsWith('.png') && f !== '.gitkeep') {
+        fs.unlinkSync(path.join(LETTERS_DIR, f));
+        deleted++;
+      }
+    }
+    console.log(`[reset] deleted ${deleted} letter(s)`);
+    res.json({ ok: true, deleted });
   } catch (err) {
-    console.warn('[rembg] warm-up failed (non-fatal):', err.message);
-  } finally {
-    try { fs.unlinkSync(warmPath); } catch {}
-    try { fs.unlinkSync(warmOut); } catch {}
+    res.json({ ok: false, error: err.message });
   }
-}
+});
 
 function getLocalIP() {
   const nets = os.networkInterfaces();
@@ -134,6 +179,8 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`\nFont Maker running at ${url}\n`);
   console.log('Scan this QR code with your phone (same WiFi required):\n');
   qrcode.generate(url, { small: true });
-  // Fire-and-forget warm-up so it doesn't block the listen callback
-  setImmediate(warmRembg);
+  startRembgServer();
+  waitForRembgServer()
+    .then(() => console.log('[rembg] HTTP server ready'))
+    .catch(err => console.error('[rembg] startup error:', err.message));
 });
