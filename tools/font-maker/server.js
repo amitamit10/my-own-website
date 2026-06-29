@@ -104,6 +104,7 @@ const upload = multer({
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/letters', express.static(LETTERS_DIR));
 
 app.get('/status', (req, res) => {
   const done = CHARS.filter(c => fs.existsSync(path.join(LETTERS_DIR, `${c}.png`)));

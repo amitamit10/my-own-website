@@ -18,6 +18,13 @@
       <button id="retake-btn">↻ Retake</button>
     </div>
   </div>
+  <div id="result-preview" hidden>
+    <p id="result-label">Background removed ✓</p>
+    <div id="result-img-wrap">
+      <img id="result-img" alt="Background removed result" />
+    </div>
+    <button id="next-btn">Next letter →</button>
+  </div>
   <p id="status-msg"></p>
   <p id="progress"></p>
   <p id="done-list"></p>
@@ -36,6 +43,10 @@
     const usePhotoBtn = document.getElementById('use-photo-btn');
     const retakeBtn = document.getElementById('retake-btn');
     const resetBtn = document.getElementById('reset-btn');
+    const resultPreview = document.getElementById('result-preview');
+    const resultImg = document.getElementById('result-img');
+    const resultLabel = document.getElementById('result-label');
+    const nextBtn = document.getElementById('next-btn');
     let current = null;
 
     async function loadStatus() {
@@ -47,6 +58,7 @@
       btn.disabled = !current;
       btn.hidden = false;
       preview.hidden = true;
+      resultPreview.hidden = true;
       if (!current) statusEl.textContent = 'All letters captured!';
     }
 
@@ -61,9 +73,17 @@
       form.append('photo', file);
       try {
         const { ok, error } = await fetch('/upload', { method: 'POST', body: form }).then(r => r.json());
-        statusEl.textContent = ok ? `✓ ${current} saved!` : `Error: ${error}`;
-        if (ok) await loadStatus();
-        else btn.disabled = false;
+        if (ok) {
+          const savedChar = current;
+          preview.hidden = true;
+          resultLabel.textContent = `"${savedChar}" — background removed ✓`;
+          resultImg.src = `/letters/${savedChar}.png?t=${Date.now()}`;
+          resultPreview.hidden = false;
+          statusEl.textContent = '';
+        } else {
+          statusEl.textContent = `Error: ${error}`;
+          btn.disabled = false;
+        }
       } catch {
         statusEl.textContent = 'Upload failed, try again.';
         btn.disabled = false;
@@ -95,6 +115,8 @@
       fileInput.value = '';
       fileInput.click();
     });
+
+    nextBtn.addEventListener('click', () => loadStatus());
 
     resetBtn.addEventListener('click', async () => {
       if (!confirm('Delete all captured letters? This cannot be undone.')) return;

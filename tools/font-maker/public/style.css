@@ -86,3 +86,41 @@ input[type="file"] { display: none; }
   z-index: 100;
 }
 .reset-corner:hover { background: #3a0a0a; }
+
+#result-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+#result-preview[hidden] { display: none; }
+#result-label { font-size: 1rem; color: #00d4ff; font-weight: 700; }
+#result-img-wrap {
+  background-image: linear-gradient(45deg, #333 25%, transparent 25%),
+    linear-gradient(-45deg, #333 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #333 75%),
+    linear-gradient(-45deg, transparent 75%, #333 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  border: 2px solid #00d4ff;
+  padding: 0.5rem;
+}
+#result-img {
+  max-width: 80vw;
+  max-height: 45vh;
+  display: block;
+  border-radius: 8px;
+}
+#next-btn {
+  background: #00d4ff;
+  color: #000;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 0.85rem 2rem;
+  border-radius: 999px;
+  cursor: pointer;
+  border: none;
+}
