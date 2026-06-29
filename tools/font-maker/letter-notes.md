@@ -1,14 +1,18 @@
-# Letter Quality Notes
+# Letter Quality Report
+
+Water font glyph QA pass. Only silhouette quality is evaluated — halos, color, and dark smudges are ignored per the rendering pipeline (solid black output).
 
 ## A — NEEDS WORK
-**Problem:** The horizontal crossbar extends far to the right of the right leg, creating two long horizontal arms sticking out the right side at the crossbar level. In a black silhouette this would look like an A with a long protrusion.
+**Problem:** Small detached blob on the right arm tip (would render as an unwanted black dot next to the A)
 **Manually fixable:** Yes
-**How to fix:** Open A.png, trim the rightward extension of the crossbar so it stops at the right leg.
+**How to fix:** Run `fix-letters.py` — connected-component removal will erase the stray piece.
 
 ---
 
-## B — PASS
-**Problem:** None
+## B — NEEDS WORK
+**Problem:** Small detached drop below the bottom of the spine
+**Manually fixable:** Yes
+**How to fix:** Run `fix-letters.py`.
 
 ---
 
@@ -18,19 +22,21 @@
 ---
 
 ## D — PASS
-**Problem:** None
+**Problem:** None (dark smudge at top-left is a lighting artifact, not a structural issue)
 
 ---
 
 ## E — NEEDS WORK
-**Problem:** The top horizontal arm is a disconnected piece floating above the spine. The middle and bottom arms are connected to the spine, but the top arm is a separate blob with a clear gap.
+**Problem:** Small detached blob just below the middle arm
 **Manually fixable:** Yes
-**How to fix:** Open E.png, draw a short vertical bridge connecting the top arm down to where the spine begins, or move the top arm down to touch the spine.
+**How to fix:** Run `fix-letters.py`.
 
 ---
 
-## F — PASS
-**Problem:** None
+## F — NEEDS WORK
+**Problem:** Small detached blob hanging off the bottom of the vertical stem
+**Manually fixable:** Yes
+**How to fix:** Run `fix-letters.py`.
 
 ---
 
@@ -39,20 +45,24 @@
 
 ---
 
-## H — PASS
-**Problem:** None
+## H — NEEDS WORK
+**Problem:** Detached blob/notch on the upper portion of the left vertical stroke
+**Manually fixable:** Yes
+**How to fix:** Run `fix-letters.py`.
 
 ---
 
 ## I — NEEDS WORK
-**Problem:** A small isolated white blob sits well above the top serif (roughly 30 px above the top bar). In a solid black render this would appear as a stray black dot floating above the letter.
+**Problem:** Small detached dot floating above the top serif
 **Manually fixable:** Yes
-**How to fix:** Open I.png, erase the small detached dot above the top serif.
+**How to fix:** Run `fix-letters.py`.
 
 ---
 
-## J — PASS
-**Problem:** None
+## J — NEEDS WORK
+**Problem:** Small detached blob at the lower-left of the hook
+**Manually fixable:** Yes
+**How to fix:** Run `fix-letters.py`.
 
 ---
 
@@ -61,15 +71,15 @@
 
 ---
 
-## L — PASS
-**Problem:** None
+## L — NEEDS WORK
+**Problem:** Small detached blob on the upper-right of the vertical stem
+**Manually fixable:** Yes
+**How to fix:** Run `fix-letters.py`.
 
 ---
 
-## M — NEEDS WORK
-**Problem:** The middle V of the M does not descend to the baseline — it only dips slightly from the top. The shape reads more like a flat-topped "n" with a small bump, missing the characteristic V dip of M.
-**Manually fixable:** No — needs to be re-photographed
-**How to fix:** N/A
+## M — PASS
+**Problem:** None
 
 ---
 
@@ -79,7 +89,7 @@
 ---
 
 ## O — PASS
-**Problem:** None
+**Problem:** None (interior white area is a table reflection on the water cube, not a counter hole)
 
 ---
 
@@ -93,10 +103,8 @@
 
 ---
 
-## R — NEEDS WORK
-**Problem:** The diagonal leg of the R is missing or extremely short. The letter reads as a P with a small nub at the top right of the bowl, not a proper R.
-**Manually fixable:** No — needs to be re-photographed
-**How to fix:** N/A
+## R — PASS
+**Problem:** None
 
 ---
 
@@ -111,9 +119,9 @@
 ---
 
 ## U — NEEDS WORK
-**Problem:** The U is heavily distorted — the left stem is mostly transparent/missing, the right side is a detached small "L"-shaped piece, and the curved bottom does not form a clean U. The overall silhouette is not recognisable as a U.
-**Manually fixable:** No — needs to be re-photographed
-**How to fix:** N/A
+**Problem:** Small detached blob at the lower-right corner
+**Manually fixable:** Yes
+**How to fix:** Run `fix-letters.py`.
 
 ---
 
@@ -123,9 +131,9 @@
 ---
 
 ## W — NEEDS WORK
-**Problem:** A small detached white dot sits to the upper-right of the final V stroke (roughly 20 px from the top of the rightmost arm). In solid black this would render as a stray black dot.
+**Problem:** Small detached dot at the upper-right tip
 **Manually fixable:** Yes
-**How to fix:** Open W.png, erase the small detached dot at the upper-right of the letter.
+**How to fix:** Run `fix-letters.py`.
 
 ---
 
@@ -134,15 +142,13 @@
 
 ---
 
-## Y — NEEDS WORK
-**Problem:** The upper V portion and the lower vertical stem are disconnected — there is a visible gap between where the V arms meet and the top of the descending stem. The letter reads as a V with a separate small piece below it.
-**Manually fixable:** Yes
-**How to fix:** Open Y.png, fill in the gap between the V junction and the top of the lower stem with a short vertical bridge.
+## Y — PASS
+**Problem:** None (dark smudge in the lower-right is a lighting/background artifact, not a structural issue; the Y silhouette is intact)
 
 ---
 
 ## Z — PASS
-**Problem:** None
+**Problem:** None (interior white area is a table reflection, not a structural issue)
 
 ---
 
@@ -151,8 +157,10 @@
 
 ---
 
-## 1 — PASS
-**Problem:** None
+## 1 — NEEDS WORK
+**Problem:** Small detached blob at the bottom of the stem
+**Manually fixable:** Yes
+**How to fix:** Run `fix-letters.py`.
 
 ---
 
@@ -166,15 +174,17 @@
 
 ---
 
-## 4 — PASS
-**Problem:** None
+## 4 — NEEDS WORK
+**Problem:** Small detached blob at the top-left of the horizontal crossbar
+**Manually fixable:** Yes
+**How to fix:** Run `fix-letters.py`.
 
 ---
 
 ## 5 — NEEDS WORK
-**Problem:** A small detached white blob sits to the right of the 5, roughly level with the middle of the letter. In solid black this would appear as an unwanted black dot next to the glyph.
+**Problem:** Small detached dot to the right of the bowl
 **Manually fixable:** Yes
-**How to fix:** Open 5.png, erase the small detached dot to the right of the letter.
+**How to fix:** Run `fix-letters.py`.
 
 ---
 
@@ -189,9 +199,9 @@
 ---
 
 ## 8 — NEEDS WORK
-**Problem:** A small detached white dot sits to the right of the upper bowl of the 8. In solid black this would appear as a stray black dot beside the glyph.
+**Problem:** Small detached dot to the right of the lower bowl
 **Manually fixable:** Yes
-**How to fix:** Open 8.png, erase the small detached dot to the right of the upper bowl.
+**How to fix:** Run `fix-letters.py`.
 
 ---
 
