@@ -1,7 +1,7 @@
 # Codex Handoff — Personal Portfolio Website
 
 **Date:** 2026-06-29  
-**Current phase: Phase 2 — Site Foundation**
+**Current phase: Phase 3 — Core Sections**
 
 ---
 
@@ -19,11 +19,29 @@ Custom water-photography font for display headings (assembled from letter PNGs i
 ### Phase 1 — DONE
 - `tools/font-maker/` is a fully working standalone Express server (port 3333).
 - All 36 letter PNGs (A–Z, 0–9) were photographed on a phone via WiFi and processed with `rembg` (background removal).
-- `tools/font-maker/fix-letters.py` was run to erase stray pixel blobs.
-- `tools/font-maker/letter-notes.md` has the QA report (15 letters still marked NEEDS WORK — mostly cosmetic blobs; 21 PASS). The font assembly (`water.woff2`) happens in a later polish step — for now a placeholder file will be used.
+- `tools/font-maker/fix-letters.py` was added to erase stray pixel blobs.
 
-### Phase 2 — START HERE
-Scaffold the Next.js site. **No Next.js files exist yet** — the repo root is just `tools/`, `docs/`, `.kilo/`, and config files.
+### Phase 1.5 — DONE
+- `tools/font-maker/letter-notes.md` now reflects the final verified set: **36 PASS / 36 total**.
+- The glyph cleanup pass is finished, including black-background removal via `tools/font-maker/transparentize_letters.py`.
+- `tools/font-builder/` now builds the real site assets locally:
+  - `tools/font-builder/output/water.ttf`
+  - `tools/font-builder/output/water.woff2`
+  - `tools/font-builder/output/wordmarks/amit.png`
+  - `tools/font-builder/output/wordmarks/projects.png`
+- The exported webfont includes `COLR/CPAL` color tables, so the water font is colorized instead of monochrome.
+- The site no longer needs a fake placeholder font file; use the real generated `water.woff2` from `tools/font-builder/output/`.
+
+### Phase 2 — DONE
+- The repo root now contains the App Router site scaffold (`app/`, `public/`, `components/`, `lib/`, `content/`, package files).
+- The site uses the real generated water font from `public/fonts/water.woff2`, copied from `tools/font-builder/output/water.woff2`.
+- `lib/content.ts` exists for projects/blog MDX loading.
+- `components/Nav.tsx` and the Phase 2 placeholder home page are in place.
+- Vercel project `personal-website` is linked and deployed.
+- Because this workspace path contains `!`, Next 15's Webpack build was not viable here. Phase 2 was completed on **Next.js 16.2.9 (Turbopack)** instead.
+
+### Phase 3 — START HERE
+Build the core sections on top of the current scaffold.
 
 ---
 
@@ -48,7 +66,7 @@ Replace `app/globals.css` with the design token CSS defined in the plan.
 Key tokens: `--bg: #0a0a0a`, `--accent: #00d4ff`, `--font-display`, `--font-body`.
 
 ### Task 3 — Custom font setup
-- `mkdir -p public/fonts && touch public/fonts/water.woff2` (placeholder — empty file is fine, Next.js needs the path to exist)
+- copy the real generated font from `tools/font-builder/output/water.woff2` into `public/fonts/water.woff2`
 - Update `app/layout.tsx` to load the font via `next/font/local` into `--font-water` CSS variable
 - `npm install geist`
 

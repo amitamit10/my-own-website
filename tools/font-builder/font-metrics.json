@@ -1,0 +1,16 @@
+{
+  "fontName": "WaterDisplay",
+  "familyName": "Water Display",
+  "styleName": "Regular",
+  "unitsPerEm": 1000,
+  "ascender": 820,
+  "descender": -180,
+  "capHeight": 700,
+  "defaultAdvanceWidth": 760,
+  "digitAdvanceWidth": 700,
+  "sideBearing": 70,
+  "padding": 96,
+  "normalizeCanvas": 1024,
+  "simplifyTolerance": 2.2,
+  "version": "Version 0.1"
+}

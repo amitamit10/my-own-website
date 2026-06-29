@@ -25,7 +25,7 @@
 **Interfaces:**
 - Produces: `npm run dev` starts dev server at `localhost:3000`
 
-- [ ] **Step 1: Run create-next-app**
+- [x] **Step 1: Run create-next-app**
 
 ```bash
 cd "/home/amit/Desktop/my own website!!!" && \
@@ -40,7 +40,7 @@ npx create-next-app@latest . \
 
 Expected: project files created, `npm run dev` works.
 
-- [ ] **Step 2: Verify dev server starts**
+- [x] **Step 2: Verify dev server starts**
 
 ```bash
 npm run dev
@@ -50,7 +50,7 @@ Expected: `▲ Next.js 15.x.x — ready on http://localhost:3000`
 
 Stop with Ctrl+C.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add -A && git commit -m "feat: scaffold Next.js 15 with Tailwind and TypeScript"
@@ -66,7 +66,7 @@ git add -A && git commit -m "feat: scaffold Next.js 15 with Tailwind and TypeScr
 **Interfaces:**
 - Produces: CSS custom properties for the site's design tokens (dark background, cyan accent, font variables)
 
-- [ ] **Step 1: Replace `app/globals.css`**
+- [x] **Step 1: Replace `app/globals.css`**
 
 ```css
 @import "tailwindcss";
@@ -106,7 +106,7 @@ h1, h2, h3 {
 ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
 ```
 
-- [ ] **Step 2: Verify styles apply**
+- [x] **Step 2: Verify styles apply**
 
 ```bash
 npm run dev
@@ -114,7 +114,7 @@ npm run dev
 
 Open `http://localhost:3000` — background should be near-black (`#0a0a0a`).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add app/globals.css && git commit -m "feat: configure design tokens and global styles"
@@ -131,7 +131,7 @@ git add app/globals.css && git commit -m "feat: configure design tokens and glob
 **Interfaces:**
 - Produces: `--font-water` CSS variable available site-wide; falls back to system font until real woff2 is added
 
-- [ ] **Step 1: Create font placeholder README**
+- [x] **Step 1: Create font placeholder README**
 
 ```bash
 mkdir -p public/fonts
@@ -147,7 +147,7 @@ Place `water.woff2` here after completing Phase 1 (font-maker tool).
 Until then, the site falls back to system-ui for display headings.
 ```
 
-- [ ] **Step 2: Update `app/layout.tsx`**
+- [x] **Step 2: Update `app/layout.tsx`**
 
 ```tsx
 import type { Metadata } from 'next'
@@ -176,13 +176,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-- [ ] **Step 3: Install Geist font**
+- [x] **Step 3: Install Geist font**
 
 ```bash
 npm install geist
 ```
 
-- [ ] **Step 4: Create a placeholder `water.woff2`**
+- [x] **Step 4: Create a placeholder `water.woff2`**
 
 The font file must exist for Next.js to not error on build. Create a 0-byte placeholder:
 
@@ -190,7 +190,7 @@ The font file must exist for Next.js to not error on build. Create a 0-byte plac
 touch public/fonts/water.woff2
 ```
 
-- [ ] **Step 5: Verify build passes**
+- [x] **Step 5: Verify build passes**
 
 ```bash
 npm run build
@@ -198,7 +198,7 @@ npm run build
 
 Expected: Build completes without errors. (Font will silently fall back since woff2 is empty.)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add app/layout.tsx public/fonts/ package.json package-lock.json && \
@@ -222,14 +222,14 @@ git commit -m "feat: add custom font setup with water font variable"
   - `getBlogPostBySlug(slug: string): Promise<BlogPost | null>`
   - Types: `Project`, `BlogPost` (see step 1)
 
-- [ ] **Step 1: Install dependencies**
+- [x] **Step 1: Install dependencies**
 
 ```bash
 npm install gray-matter next-mdx-remote
 npm install -D @types/node
 ```
 
-- [ ] **Step 2: Create `lib/content.ts`**
+- [x] **Step 2: Create `lib/content.ts`**
 
 ```ts
 import fs from 'fs'
@@ -342,14 +342,14 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
 }
 ```
 
-- [ ] **Step 3: Create content directory placeholders**
+- [x] **Step 3: Create content directory placeholders**
 
 ```bash
 mkdir -p content/projects content/blog
 touch content/projects/.gitkeep content/blog/.gitkeep
 ```
 
-- [ ] **Step 4: Verify TypeScript compiles**
+- [x] **Step 4: Verify TypeScript compiles**
 
 ```bash
 npx tsc --noEmit
@@ -357,7 +357,7 @@ npx tsc --noEmit
 
 Expected: no errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/ content/ package.json package-lock.json && \
@@ -376,7 +376,7 @@ git commit -m "feat: add MDX content reading utilities"
 **Interfaces:**
 - Produces: persistent nav bar; `app/page.tsx` renders children passed by later tasks
 
-- [ ] **Step 1: Create `components/Nav.tsx`**
+- [x] **Step 1: Create `components/Nav.tsx`**
 
 ```tsx
 'use client'
@@ -430,7 +430,7 @@ export default function Nav() {
 }
 ```
 
-- [ ] **Step 2: Update `app/layout.tsx` to include Nav**
+- [x] **Step 2: Update `app/layout.tsx` to include Nav**
 
 ```tsx
 import type { Metadata } from 'next'
@@ -463,7 +463,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-- [ ] **Step 3: Replace `app/page.tsx` with placeholder**
+- [x] **Step 3: Replace `app/page.tsx` with placeholder**
 
 ```tsx
 export default function Home() {
@@ -475,7 +475,7 @@ export default function Home() {
 }
 ```
 
-- [ ] **Step 4: Verify in browser**
+- [x] **Step 4: Verify in browser**
 
 ```bash
 npm run dev
@@ -483,7 +483,7 @@ npm run dev
 
 Open `http://localhost:3000`. You should see a black page with a fixed nav bar showing "AE" in cyan on the left and nav links on the right.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/layout.tsx app/page.tsx components/ && \
@@ -500,7 +500,7 @@ git commit -m "feat: add nav bar and layout shell"
 **Interfaces:**
 - Produces: live preview URL on Vercel
 
-- [ ] **Step 1: Deploy to Vercel preview**
+- [x] **Step 1: Deploy to Vercel preview**
 
 ```bash
 vercel
@@ -508,11 +508,11 @@ vercel
 
 Follow prompts: link to existing project or create new one named `personal-website`. Accept defaults.
 
-- [ ] **Step 2: Verify preview URL loads**
+- [x] **Step 2: Verify preview URL loads**
 
 Open the preview URL printed by the CLI. The black page with nav bar should load.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add .vercel/ && git commit -m "chore: add Vercel project config"
