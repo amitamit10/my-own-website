@@ -15,6 +15,7 @@ Clean and minimal.
 - Generous vertical spacing and large tap targets optimized for phone use.
 - Reset control is a subtle, out-of-the-way pill in the top-right corner.
 - Preview screen uses a rounded container for the photo with clear primary/secondary actions.
+- Result preview shows the transparent PNG on a subtle checkerboard pattern.
 
 ## Screens
 
@@ -28,6 +29,15 @@ Clean and minimal.
 ### Preview Screen
 - Full-width rounded photo preview.
 - "Use this photo" (primary) and "Retake" (secondary) buttons side by side below.
+
+### Result Preview Screen
+- Label showing the captured letter and "background removed" confirmation.
+- The processed transparent PNG shown on a subtle checkerboard background.
+- "Next letter" button to advance.
+
+## Technical Notes
+- Images are compressed client-side before upload to reduce transfer time and server load.
+- The rembg model runs in a persistent HTTP server for fast background removal.
 
 ## Files to Change
 - `tools/font-maker/public/index.html` — update element IDs/classes as needed.
