@@ -1,0 +1,37 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: system-ui, sans-serif;
+  background: #0a0a0a;
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+#letter {
+  font-size: 40vw;
+  line-height: 1;
+  font-weight: 900;
+  color: #00d4ff;
+  margin-bottom: 1rem;
+}
+#instruction { font-size: 1.2rem; color: #aaa; margin-bottom: 2rem; }
+#capture-btn {
+  background: #00d4ff;
+  color: #000;
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 1rem 2.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  border: none;
+  margin-bottom: 1rem;
+}
+#capture-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+#status-msg { font-size: 1rem; color: #aaa; min-height: 1.5rem; }
+#progress { font-size: 0.85rem; color: #555; margin-top: 1rem; }
+#done-list { font-size: 0.75rem; color: #333; margin-top: 0.5rem; word-break: break-all; }
+input[type="file"] { display: none; }

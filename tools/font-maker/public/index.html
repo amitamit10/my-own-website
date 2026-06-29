@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Font Maker</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div id="letter">A</div>
+  <p id="instruction">Form this letter with water, then tap capture.</p>
+  <button id="capture-btn">📸 Capture</button>
+  <input type="file" id="file-input" accept="image/*" capture="environment" />
+  <p id="status-msg"></p>
+  <p id="progress"></p>
+  <p id="done-list"></p>
+
+  <script>
+    const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+    const letterEl = document.getElementById('letter');
+    const statusEl = document.getElementById('status-msg');
+    const progressEl = document.getElementById('progress');
+    const doneEl = document.getElementById('done-list');
+    const btn = document.getElementById('capture-btn');
+    const fileInput = document.getElementById('file-input');
+    let current = null;
+
+    async function loadStatus() {
+      const { done, remaining } = await fetch('/status').then(r => r.json());
+      current = remaining[0] || null;
+      letterEl.textContent = current || '✓';
+      progressEl.textContent = `${done.length}/${CHARS.length} captured`;
+      doneEl.textContent = done.length ? `Done: ${done.join(' ')}` : '';
+      btn.disabled = !current;
+      if (!current) statusEl.textContent = 'All letters captured!';
+    }
+
+    btn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      if (!file || !current) return;
+      btn.disabled = true;
+      statusEl.textContent = 'Uploading…';
+      const form = new FormData();
+      form.append('char', current);
+      form.append('photo', file);
+      try {
+        const { ok, error } = await fetch('/upload', { method: 'POST', body: form }).then(r => r.json());
+        statusEl.textContent = ok ? `✓ ${current} saved!` : `Error: ${error}`;
+        if (ok) await loadStatus();
+        else btn.disabled = false;
+      } catch {
+        statusEl.textContent = 'Upload failed, try again.';
+        btn.disabled = false;
+      }
+      fileInput.value = '';
+    });
+
+    loadStatus();
+  </script>
+</body>
+</html>
