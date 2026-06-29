@@ -81,15 +81,20 @@ process.on('SIGINT', () => { killRembgServer(); process.exit(0); });
 process.on('SIGTERM', () => { killRembgServer(); process.exit(0); });
 
 async function waitForRembgServer(timeoutMs = 30000) {
+  const net = require('net');
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(REMBG_URL.replace('/api/remove', '/api/health'), { method: 'GET' });
-      if (res.ok) return;
-    } catch {}
-    await new Promise(r => setTimeout(r, 500));
+    const ok = await new Promise(resolve => {
+      const sock = net.createConnection({ host: '127.0.0.1', port: REMBG_PORT }, () => {
+        sock.end();
+        resolve(true);
+      });
+      sock.on('error', () => resolve(false));
+    });
+    if (ok) return;
+    await new Promise(r => setTimeout(r, 250));
   }
-  throw new Error('rembg server failed to start within 30s');
+  throw new Error(`rembg server failed to accept connections on port ${REMBG_PORT} within ${timeoutMs / 1000}s`);
 }
 
 // ── Use memoryStorage so the route handler can write the file AFTER multer fully parses the body ──
@@ -180,7 +185,9 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('Scan this QR code with your phone (same WiFi required):\n');
   qrcode.generate(url, { small: true });
   startRembgServer();
-  waitForRembgServer()
-    .then(() => console.log('[rembg] HTTP server ready'))
-    .catch(err => console.error('[rembg] startup error:', err.message));
+  setTimeout(() => {
+    waitForRembgServer()
+      .then(() => console.log(`[rembg] HTTP server ready on port ${REMBG_PORT}`))
+      .catch(err => console.error('[rembg] startup error:', err.message));
+  }, 500);
 });

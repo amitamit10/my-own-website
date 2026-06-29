@@ -1,5 +1,7 @@
 uploads/*
 !uploads/.gitkeep
+letters/*.png
+!letters/.gitkeep
 node_modules/
 __pycache__/
 *.pyc
