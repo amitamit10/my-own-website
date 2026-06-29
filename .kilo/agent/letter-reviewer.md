@@ -2,7 +2,7 @@
 mode: primary
 description: Visually inspect water letter PNGs for font quality and write findings to letter-notes.md
 options:
-  displayName: Letter Reviewer
+  displayName: Letter QA & Fixer
   id: letter-reviewer
 permission:
   read: allow
