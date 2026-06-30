@@ -1,180 +1,552 @@
-# Phase 3: Core Sections — Implementation Plan
+# Phase 3: Core Sections Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build Hero, About/Strengths, Projects grid, and Contact sections with a real sample project MDX file.
+**Goal:** Build the Hero, About, Projects, and Contact sections in the approved white-paper, water-palette, low-FPS handmade direction.
 
-**Architecture:** All sections are React Server Components rendered on `app/page.tsx`. Each section is a separate component in `components/`. The Projects section reads from `content/projects/` via `lib/content.ts` from Phase 2. Bold, dark, creative aesthetic with cyan accent throughout.
+**Architecture:** `app/page.tsx` remains the single server-rendered landing page. Section components live in `components/` and stay focused by responsibility: Hero composition, About narrative, project card/grid rendering, and Contact CTA. The page uses the existing `lib/content.ts` loader from Phase 2, real assets from `tools/font-builder/output/wordmarks/`, and a refreshed global token system in `app/globals.css`.
 
-**Tech Stack:** Next.js 15 App Router, TypeScript, Tailwind CSS v4, `lib/content.ts` from Phase 2
-
-## Global Constraints
-- All section components are Server Components (no `'use client'` unless interactivity required)
-- Section IDs must match Nav links from Phase 2: `#about`, `#projects`, `#contact`
-- Color tokens from Phase 2: `--bg`, `--surface`, `--accent`, `--text`, `--text-muted`, `--font-display`
+**Tech Stack:** Next.js 16 App Router, TypeScript, Tailwind CSS v4, existing `lib/content.ts`, local font and wordmark assets, optional generated collage textures under `public/`
 
 ---
 
-### Task 1: Hero section
+## File Structure
+
+- Modify: `app/globals.css`
+  - Replace the dark/cyan token set with white-paper, ink, sand, and water-beige tokens.
+  - Add low-FPS motion utilities and handmade divider helpers.
+- Modify: `app/page.tsx`
+  - Compose the final Phase 3 landing page from section components.
+- Modify: `components/Nav.tsx`
+  - Restyle the nav to match the paper layout and calmer palette.
+- Create: `components/Hero.tsx`
+  - Wordmark-led hero using real generated water assets and handmade composition.
+- Create: `components/About.tsx`
+  - Editorial introduction plus strengths list in readable paper blocks.
+- Create: `components/ProjectCard.tsx`
+  - Reusable project card with sketch-border framing.
+- Create: `components/Projects.tsx`
+  - Server component that loads MDX projects and renders the grid.
+- Create: `components/Contact.tsx`
+  - Final CTA section using the same paper/ink system.
+- Create: `content/projects/personal-website.mdx`
+  - Real sample project entry for the landing page.
+- Create: `public/wordmarks/amit.png`
+  - Copy of the generated real wordmark for direct page use.
+- Create: `public/wordmarks/projects.png`
+  - Copy of the generated section wordmark for direct page use.
+- Create: `public/textures/paper-ripple-01.png` (optional if needed during implementation)
+  - Supporting handmade texture only if the existing font assets are not enough.
+
+---
+
+### Task 1: Bring the real wordmark assets into the site and retune global tokens
+
+**Files:**
+- Create: `public/wordmarks/amit.png`
+- Create: `public/wordmarks/projects.png`
+- Modify: `app/globals.css`
+
+**Interfaces:**
+- Produces: reusable public assets and a global visual system that matches the approved art direction
+
+- [x] **Step 1: Copy the existing real wordmarks into `public/wordmarks/`**
+
+Run:
+
+```bash
+mkdir -p public/wordmarks
+cp tools/font-builder/output/wordmarks/amit.png public/wordmarks/amit.png
+cp tools/font-builder/output/wordmarks/projects.png public/wordmarks/projects.png
+```
+
+Expected: `public/wordmarks/amit.png` and `public/wordmarks/projects.png` exist.
+
+- [x] **Step 2: Replace the dark token CSS in `app/globals.css`**
+
+```css
+@import "tailwindcss";
+
+:root {
+  --paper: #f8f3ea;
+  --paper-warm: #efe6d8;
+  --paper-line: #d6cab7;
+  --ink: #2f241b;
+  --ink-soft: #5f5145;
+  --water-beige: #c9af85;
+  --water-sand: #b89a74;
+  --wash: #e7dccd;
+  --font-display: var(--font-water), system-ui, sans-serif;
+  --font-body: var(--font-geist-sans), system-ui, sans-serif;
+  --step-snap: steps(4, end);
+}
+
+@theme inline {
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --font-sans: var(--font-body);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 20% 12%, rgba(201, 175, 133, 0.18), transparent 28%),
+    radial-gradient(circle at 78% 10%, rgba(184, 154, 116, 0.14), transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(248, 243, 234, 0.92)),
+    var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  color: var(--ink);
+}
+
+p {
+  margin: 0;
+}
+
+::selection {
+  background: rgba(201, 175, 133, 0.32);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--paper);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(95, 81, 69, 0.35);
+}
+
+.paper-panel {
+  background: rgba(255, 250, 243, 0.88);
+  border: 1px solid rgba(95, 81, 69, 0.18);
+  box-shadow: 0 3px 12px rgba(90, 72, 54, 0.08);
+}
+
+.sketch-divider {
+  position: relative;
+}
+
+.sketch-divider::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+  width: 88px;
+  height: 10px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='10' viewBox='0 0 88 10' fill='none'%3E%3Cpath d='M2 8C19 3 36 4 50 6C63 8 74 7 86 2' stroke='%235f5145' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")
+      no-repeat center / contain;
+  opacity: 0.72;
+}
+
+.fps-jitter {
+  animation: jitter-frame 2.8s var(--step-snap) infinite;
+  transform-origin: center;
+}
+
+.fps-drift {
+  animation: drift-frame 6s steps(6, end) infinite;
+}
+
+.fps-hover:hover {
+  animation: hover-nudge 260ms steps(3, end) forwards;
+}
+
+@keyframes jitter-frame {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(1px, -1px) rotate(-0.3deg); }
+  50% { transform: translate(-1px, 1px) rotate(0.25deg); }
+  75% { transform: translate(1px, 0) rotate(-0.15deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes drift-frame {
+  0% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(4px, -3px, 0); }
+  50% { transform: translate3d(-2px, 3px, 0); }
+  75% { transform: translate3d(3px, 1px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes hover-nudge {
+  from { transform: translate3d(0, 0, 0) rotate(0deg); }
+  to { transform: translate3d(2px, -2px, 0) rotate(-0.35deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .fps-jitter,
+  .fps-drift,
+  .fps-hover:hover {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+```
+
+- [x] **Step 3: Verify the CSS parses cleanly**
+
+Run:
+
+```bash
+npm run build
+```
+
+Expected: build succeeds without CSS errors.
+
+- [x] **Step 4: Commit**
+
+```bash
+git add app/globals.css public/wordmarks/
+git commit -m "feat: add handmade paper design tokens and wordmark assets"
+```
+
+---
+
+### Task 2: Restyle navigation for the paper layout
+
+**Files:**
+- Modify: `components/Nav.tsx`
+
+**Interfaces:**
+- Produces: readable top nav that fits the handmade paper composition without looking like a SaaS header
+
+- [x] **Step 1: Replace `components/Nav.tsx`**
+
+```tsx
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+
+const links = [
+  { href: "#about", label: "About" },
+  { href: "#projects", label: "Projects" },
+  { href: "#github", label: "GitHub" },
+  { href: "/blog", label: "Blog" },
+  { href: "#contact", label: "Contact" },
+];
+
+export default function Nav() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <nav className="fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-8">
+      <div
+        className="mx-auto flex max-w-6xl items-center justify-between border px-4 py-3 md:px-5"
+        style={{
+          background: "rgba(255,250,243,0.86)",
+          borderColor: "rgba(95,81,69,0.18)",
+          boxShadow: "0 2px 10px rgba(90,72,54,0.08)",
+          backdropFilter: "blur(8px)",
+        }}
+      >
+        <Link href="/" className="text-sm font-semibold tracking-[0.08em]" style={{ color: "var(--ink)" }}>
+          AMIT ELGABSY
+        </Link>
+
+        <ul className="hidden items-center gap-6 md:flex">
+          {links.map((link) => (
+            <li key={link.href}>
+              <Link
+                href={link.href}
+                className="text-sm transition-opacity duration-150 hover:opacity-65"
+                style={{ color: "var(--ink-soft)" }}
+              >
+                {link.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        <button
+          type="button"
+          className="text-sm font-medium md:hidden"
+          aria-label="Toggle navigation"
+          onClick={() => setOpen((value) => !value)}
+          style={{ color: "var(--ink)" }}
+        >
+          {open ? "Close" : "Menu"}
+        </button>
+      </div>
+
+      {open ? (
+        <div
+          className="mx-auto mt-2 max-w-6xl border px-4 py-3 md:hidden"
+          style={{
+            background: "rgba(255,250,243,0.95)",
+            borderColor: "rgba(95,81,69,0.18)",
+          }}
+        >
+          <ul className="flex flex-col gap-3">
+            {links.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className="block text-sm"
+                  style={{ color: "var(--ink-soft)" }}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </nav>
+  );
+}
+```
+
+- [x] **Step 2: Verify the nav still works**
+
+Run:
+
+```bash
+npm run dev
+```
+
+Expected: top nav is readable on desktop and mobile, and the mobile toggle opens/closes without layout breakage.
+
+- [x] **Step 3: Commit**
+
+```bash
+git add components/Nav.tsx
+git commit -m "feat: restyle navigation for the paper layout"
+```
+
+---
+
+### Task 3: Build the wordmark-led Hero section
 
 **Files:**
 - Create: `components/Hero.tsx`
 - Modify: `app/page.tsx`
 
 **Interfaces:**
-- Produces: `<Hero />` — full-viewport hero with name, tagline, and scroll CTA
+- Produces: first-screen hero anchored by the real wordmark, no profile image, low-FPS handmade motion
 
-- [ ] **Step 1: Create `components/Hero.tsx`**
+- [x] **Step 1: Create `components/Hero.tsx`**
 
 ```tsx
+import Image from "next/image";
+
 export default function Hero() {
   return (
-    <section
-      className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 overflow-hidden"
-      style={{ background: 'var(--bg)' }}
-    >
-      {/* Glow blob */}
-      <div
-        className="absolute rounded-full blur-[120px] opacity-20 pointer-events-none"
-        style={{
-          width: '60vw',
-          height: '60vw',
-          background: 'var(--accent)',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -60%)',
-        }}
-      />
+    <section className="relative overflow-hidden px-4 pb-16 pt-32 md:px-8 md:pb-24 md:pt-36">
+      <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
+        <div className="space-y-8">
+          <div className="space-y-4">
+            <p className="text-sm leading-6 md:text-base" style={{ color: "var(--ink-soft)" }}>
+              Full-stack developer building products with strong visual instincts, fast execution, and a taste
+              for weird ideas that still ship.
+            </p>
 
-      <p className="text-sm tracking-[0.3em] uppercase mb-4" style={{ color: 'var(--accent)' }}>
-        Developer · Builder · Creator
-      </p>
+            <div className="max-w-4xl fps-jitter">
+              <Image
+                src="/wordmarks/amit.png"
+                alt="Amit wordmark"
+                width={1200}
+                height={430}
+                priority
+                className="h-auto w-full"
+              />
+            </div>
+          </div>
 
-      <h1
-        className="text-[clamp(3rem,12vw,9rem)] font-black leading-none mb-6 relative"
-        style={{ fontFamily: 'var(--font-display)', color: 'var(--text)' }}
-      >
-        Amit
-        <br />
-        <span style={{ color: 'var(--accent)' }}>Elgabsy</span>
-      </h1>
+          <div className="relative max-w-2xl border px-5 py-5 md:px-6 md:py-6 paper-panel fps-hover">
+            <p className="text-base leading-7 md:text-lg" style={{ color: "var(--ink)" }}>
+              I design and build software that feels like somebody actually cared while making it.
+              This site is part portfolio, part artifact, and part proof that code can still have a point of view.
+            </p>
+          </div>
 
-      <p
-        className="text-lg md:text-xl max-w-xl mb-10 leading-relaxed"
-        style={{ color: 'var(--text-muted)' }}
-      >
-        I build things that feel as good as they look.
-        <br />
-        Full-stack developer obsessed with bold ideas.
-      </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <a
+              href="#projects"
+              className="border px-5 py-3 text-sm font-medium transition-opacity duration-150 hover:opacity-70"
+              style={{
+                background: "var(--water-beige)",
+                color: "#231a13",
+                borderColor: "rgba(95,81,69,0.2)",
+              }}
+            >
+              See projects
+            </a>
+            <a
+              href="#contact"
+              className="border px-5 py-3 text-sm font-medium transition-opacity duration-150 hover:opacity-70"
+              style={{
+                color: "var(--ink)",
+                borderColor: "rgba(95,81,69,0.2)",
+                background: "rgba(255,250,243,0.8)",
+              }}
+            >
+              Work with me
+            </a>
+          </div>
+        </div>
 
-      <a
-        href="#projects"
-        className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-base transition-all hover:scale-105 active:scale-95"
-        style={{ background: 'var(--accent)', color: '#000' }}
-      >
-        See My Work ↓
-      </a>
+        <div className="relative min-h-[320px] lg:min-h-[480px]">
+          <div
+            className="absolute left-[8%] top-[6%] h-32 w-32 rounded-full fps-drift"
+            style={{ background: "rgba(201,175,133,0.24)" }}
+          />
+          <div
+            className="absolute right-[8%] top-[18%] h-28 w-40 rotate-[-7deg] border paper-panel fps-jitter"
+            style={{ background: "rgba(255,250,243,0.8)", borderColor: "rgba(95,81,69,0.15)" }}
+          />
+          <div
+            className="absolute left-[18%] top-[32%] w-[68%] rotate-[-3deg] border px-4 py-4 paper-panel fps-hover"
+            style={{ borderColor: "rgba(95,81,69,0.18)" }}
+          >
+            <p className="text-sm leading-6" style={{ color: "var(--ink-soft)" }}>
+              Building portfolio systems, AI-assisted flows, creative tooling, and product surfaces that do not
+              look like copied startup templates.
+            </p>
+          </div>
+          <div
+            className="absolute bottom-[12%] right-[10%] w-[58%] rotate-[2deg] border px-4 py-4 fps-jitter"
+            style={{
+              background: "rgba(231,220,205,0.7)",
+              borderColor: "rgba(95,81,69,0.14)",
+            }}
+          >
+            <p className="text-xs uppercase tracking-[0.08em]" style={{ color: "var(--ink-soft)" }}>
+              Handmade web presence
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
-  )
+  );
 }
 ```
 
-- [ ] **Step 2: Update `app/page.tsx`**
+- [x] **Step 2: Add `Hero` to `app/page.tsx`**
 
 ```tsx
-import Hero from '@/components/Hero'
+import Hero from "@/components/Hero";
 
 export default function Home() {
-  return (
-    <>
-      <Hero />
-    </>
-  )
+  return <Hero />;
 }
 ```
 
-- [ ] **Step 3: Verify in browser**
+- [x] **Step 3: Verify in the browser**
+
+Run:
 
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:3000`. Full-screen dark hero with name, tagline, and cyan CTA button should be visible.
+Expected: white-paper first screen, real water wordmark, no portrait, and handmade cutout blocks on the right.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
-git add components/Hero.tsx app/page.tsx && \
-git commit -m "feat: add Hero section"
+git add app/page.tsx components/Hero.tsx
+git commit -m "feat: add wordmark-led hero section"
 ```
 
 ---
 
-### Task 2: About / Strengths section
+### Task 4: Add the About section with readable handmade structure
 
 **Files:**
 - Create: `components/About.tsx`
 - Modify: `app/page.tsx`
 
 **Interfaces:**
-- Produces: `<About />` — bio paragraph + strengths grid
+- Produces: a clear self-introduction and strengths block without losing the handmade visual language
 
-- [ ] **Step 1: Create `components/About.tsx`**
+- [x] **Step 1: Create `components/About.tsx`**
 
 ```tsx
 const strengths = [
-  { emoji: '⚡', title: 'Fast Learner', desc: 'New stack? I'm shipping in days, not weeks.' },
-  { emoji: '🎨', title: 'Design Sense', desc: 'I care about how things look AND how they work.' },
-  { emoji: '🤖', title: 'AI Integration', desc: 'Building with LLMs before it was cool.' },
-  { emoji: '🔧', title: 'Full-Stack', desc: 'From database schema to pixel-perfect UI.' },
-  { emoji: '🚀', title: 'Ships Fast', desc: 'Working software over perfect architecture.' },
-  { emoji: '💡', title: 'Creative Problem Solver', desc: 'I find the elegant solution, not the obvious one.' },
-]
+  "Fast at turning vague ideas into working product.",
+  "Strong taste across interface design and frontend craft.",
+  "Comfortable across backend, content systems, and AI workflows.",
+  "Likes building tools that feel specific instead of generic.",
+];
 
 export default function About() {
   return (
-    <section id="about" className="py-32 px-6 max-w-5xl mx-auto">
-      <p className="text-xs tracking-[0.3em] uppercase mb-4" style={{ color: 'var(--accent)' }}>
-        About Me
-      </p>
-      <h2
-        className="text-4xl md:text-6xl font-black mb-8"
-        style={{ fontFamily: 'var(--font-display)', color: 'var(--text)' }}
-      >
-        Who I Am
-      </h2>
-      <p className="text-lg leading-relaxed max-w-2xl mb-20" style={{ color: 'var(--text-muted)' }}>
-        I'm Amit — a developer who loves building things that push boundaries.
-        I combine technical depth with a sharp eye for design, and I'm
-        obsessed with using AI to build smarter, faster products.
-        When I'm not coding, I'm exploring new tools, new ideas, and new ways
-        to make software that feels alive.
-      </p>
+    <section id="about" className="px-4 py-20 md:px-8 md:py-28">
+      <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="space-y-4">
+          <h2 className="sketch-divider text-3xl font-semibold tracking-[-0.03em] md:text-5xl">
+            About
+          </h2>
+          <p className="max-w-md text-sm leading-6 md:text-base" style={{ color: "var(--ink-soft)" }}>
+            The site should feel personal, but not self-indulgent. This section explains how Amit works,
+            what he values, and why the projects below matter.
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {strengths.map(s => (
-          <div
-            key={s.title}
-            className="rounded-2xl p-6 transition-transform hover:-translate-y-1"
-            style={{ background: 'var(--surface)', border: '1px solid rgba(255,255,255,0.05)' }}
-          >
-            <div className="text-3xl mb-3">{s.emoji}</div>
-            <h3 className="text-base font-bold mb-1" style={{ color: 'var(--text)' }}>{s.title}</h3>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>{s.desc}</p>
+        <div className="space-y-6">
+          <div className="border px-5 py-5 paper-panel md:px-6 md:py-6">
+            <p className="text-base leading-7 md:text-lg" style={{ color: "var(--ink)" }}>
+              I like work that sits between product, engineering, and visual taste. I care about how things ship,
+              how they read, and whether they leave any impression after the tab is closed.
+            </p>
           </div>
-        ))}
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {strengths.map((strength) => (
+              <div
+                key={strength}
+                className="border px-4 py-4 paper-panel fps-hover"
+                style={{ borderColor: "rgba(95,81,69,0.14)" }}
+              >
+                <p className="text-sm leading-6" style={{ color: "var(--ink-soft)" }}>
+                  {strength}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
-  )
+  );
 }
 ```
 
-- [ ] **Step 2: Add `<About />` to `app/page.tsx`**
+- [x] **Step 2: Add `About` below `Hero`**
 
 ```tsx
-import Hero from '@/components/Hero'
-import About from '@/components/About'
+import About from "@/components/About";
+import Hero from "@/components/Hero";
 
 export default function Home() {
   return (
@@ -182,61 +554,68 @@ export default function Home() {
       <Hero />
       <About />
     </>
-  )
+  );
 }
 ```
 
-- [ ] **Step 3: Verify in browser**
+- [x] **Step 3: Verify the section spacing and readability**
 
-Scroll past the Hero — you should see the About section with the strengths grid.
-
-- [ ] **Step 4: Commit**
+Run:
 
 ```bash
-git add components/About.tsx app/page.tsx && \
-git commit -m "feat: add About and Strengths section"
+npm run build
+```
+
+Expected: build passes and the About section reads clearly without reverting to generic card UI.
+
+- [x] **Step 4: Commit**
+
+```bash
+git add app/page.tsx components/About.tsx
+git commit -m "feat: add editorial about section"
 ```
 
 ---
 
-### Task 3: Sample project MDX file
+### Task 5: Add the real project content entry
 
 **Files:**
 - Create: `content/projects/personal-website.mdx`
 
 **Interfaces:**
-- Produces: one `Project` object returned by `getProjects()` from `lib/content.ts`
+- Produces: one real project entry that can be rendered by `getProjects()`
 
-- [ ] **Step 1: Create `content/projects/personal-website.mdx`**
+- [x] **Step 1: Create `content/projects/personal-website.mdx`**
 
 ```mdx
 ---
 title: Personal Portfolio Website
-description: My own portfolio site built with Next.js, featuring a custom water-photography font and AI-generated blog posts via Groq.
-tech: [Next.js, TypeScript, Tailwind CSS, Groq, Vercel]
+description: A portfolio built around a photographed water font, handmade paper composition, and AI-assisted publishing flow.
+tech: [Next.js, TypeScript, Tailwind CSS, Vercel, Groq]
 highlights:
-  - Custom font made from water photographs
-  - AI auto-generates blog posts when new projects are added
-  - Live GitHub activity feed
-  - Bold creative design
+  - Custom font and wordmarks built from photographed water letters
+  - Handmade white-paper art direction with low-FPS motion
+  - File-based content system for projects and blog posts
+  - Designed to showcase both product taste and engineering range
 github: https://github.com/amitelgabsy/personal-website
-live: https://amitelgabsy.vercel.app
-date: "2026-06-29"
+live: https://personal-website-pink-six-96.vercel.app
+date: "2026-06-30"
 ---
 
-Building my portfolio was a project in itself. I wanted something that didn't look like every other dev portfolio — so I made a custom font from water photographs and wired up Groq to write blog posts automatically when I publish new projects.
+This portfolio is meant to feel like an artifact, not a template. The goal was to make the identity system itself part of the project by building a font from photographed water letters, turning those glyphs into wordmarks, and designing the page around that handmade visual language.
 ```
 
-- [ ] **Step 2: Verify `getProjects()` returns it**
+- [x] **Step 2: Verify `getProjects()` returns the project**
 
-Create a temporary test file `lib/__test-content.ts`:
+Create `lib/__test-content.ts`:
 
 ```ts
-import { getProjects } from './content'
-getProjects().then(projects => {
-  console.log('Projects found:', projects.length)
-  console.log('First project:', projects[0]?.title)
-})
+import { getProjects } from "./content";
+
+getProjects().then((projects) => {
+  console.log("Projects found:", projects.length);
+  console.log("First project:", projects[0]?.title);
+});
 ```
 
 Run:
@@ -246,27 +625,28 @@ npx tsx lib/__test-content.ts
 ```
 
 Expected:
-```
+
+```text
 Projects found: 1
 First project: Personal Portfolio Website
 ```
 
-Delete the test file:
+Delete the temp file:
 
 ```bash
 rm lib/__test-content.ts
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
-git add content/projects/ && \
-git commit -m "feat: add sample project MDX file"
+git add content/projects/personal-website.mdx
+git commit -m "feat: add portfolio project content"
 ```
 
 ---
 
-### Task 4: Projects section
+### Task 6: Build the Projects grid from MDX content
 
 **Files:**
 - Create: `components/ProjectCard.tsx`
@@ -275,111 +655,111 @@ git commit -m "feat: add sample project MDX file"
 
 **Interfaces:**
 - Consumes: `Project` type and `getProjects()` from `lib/content.ts`
-- Produces: `<Projects />` — grid of project cards
+- Produces: readable handmade project grid that still feels like a serious portfolio
 
-- [ ] **Step 1: Create `components/ProjectCard.tsx`**
+- [x] **Step 1: Create `components/ProjectCard.tsx`**
 
 ```tsx
-import type { Project } from '@/lib/content'
-import Link from 'next/link'
+import type { Project } from "@/lib/content";
 
 export default function ProjectCard({ project }: { project: Project }) {
   return (
     <article
-      className="rounded-2xl p-6 flex flex-col gap-4 transition-transform hover:-translate-y-1"
-      style={{ background: 'var(--surface)', border: '1px solid rgba(255,255,255,0.05)' }}
+      className="flex h-full flex-col gap-5 border px-5 py-5 paper-panel fps-hover md:px-6 md:py-6"
+      style={{ borderColor: "rgba(95,81,69,0.16)" }}
     >
-      <h3 className="text-xl font-bold" style={{ color: 'var(--text)' }}>
-        {project.title}
-      </h3>
-      <p className="text-sm leading-relaxed flex-1" style={{ color: 'var(--text-muted)' }}>
-        {project.description}
-      </p>
+      <div className="space-y-3">
+        <h3 className="text-2xl font-semibold tracking-[-0.03em]" style={{ color: "var(--ink)" }}>
+          {project.title}
+        </h3>
+        <p className="text-sm leading-6 md:text-base" style={{ color: "var(--ink-soft)" }}>
+          {project.description}
+        </p>
+      </div>
+
       <div className="flex flex-wrap gap-2">
-        {project.tech.map(t => (
+        {project.tech.map((item) => (
           <span
-            key={t}
-            className="text-xs px-3 py-1 rounded-full"
-            style={{ background: 'rgba(0,212,255,0.1)', color: 'var(--accent)' }}
+            key={item}
+            className="border px-2 py-1 text-xs"
+            style={{
+              color: "var(--ink-soft)",
+              borderColor: "rgba(95,81,69,0.16)",
+              background: "rgba(239,230,216,0.65)",
+            }}
           >
-            {t}
+            {item}
           </span>
         ))}
       </div>
-      <div className="flex gap-4">
-        {project.github && (
-          <a
-            href={project.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-medium hover:underline"
-            style={{ color: 'var(--accent)' }}
-          >
-            GitHub ↗
+
+      <ul className="space-y-2">
+        {project.highlights.slice(0, 3).map((highlight) => (
+          <li key={highlight} className="text-sm leading-6" style={{ color: "var(--ink-soft)" }}>
+            {highlight}
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-auto flex flex-wrap gap-4 pt-3 text-sm">
+        {project.github ? (
+          <a href={project.github} target="_blank" rel="noreferrer" className="underline-offset-4 hover:underline">
+            Source
           </a>
-        )}
-        {project.live && (
-          <a
-            href={project.live}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-medium hover:underline"
-            style={{ color: 'var(--text-muted)' }}
-          >
-            Live ↗
+        ) : null}
+        {project.live ? (
+          <a href={project.live} target="_blank" rel="noreferrer" className="underline-offset-4 hover:underline">
+            Live
           </a>
-        )}
-        <Link
-          href={`/blog/${project.slug}-post`}
-          className="text-sm font-medium hover:underline ml-auto"
-          style={{ color: 'var(--text-muted)' }}
-        >
-          Read post →
-        </Link>
+        ) : null}
       </div>
     </article>
-  )
+  );
 }
 ```
 
-- [ ] **Step 2: Create `components/Projects.tsx`**
+- [x] **Step 2: Create `components/Projects.tsx`**
 
 ```tsx
-import { getProjects } from '@/lib/content'
-import ProjectCard from './ProjectCard'
+import { getProjects } from "@/lib/content";
+import Image from "next/image";
+import ProjectCard from "./ProjectCard";
 
 export default async function Projects() {
-  const projects = await getProjects()
+  const projects = await getProjects();
 
   return (
-    <section id="projects" className="py-32 px-6 max-w-5xl mx-auto">
-      <p className="text-xs tracking-[0.3em] uppercase mb-4" style={{ color: 'var(--accent)' }}>
-        Work
-      </p>
-      <h2
-        className="text-4xl md:text-6xl font-black mb-16"
-        style={{ fontFamily: 'var(--font-display)', color: 'var(--text)' }}
-      >
-        Projects
-      </h2>
-      {projects.length === 0 ? (
-        <p style={{ color: 'var(--text-muted)' }}>No projects yet.</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {projects.map(p => <ProjectCard key={p.slug} project={p} />)}
+    <section id="projects" className="px-4 py-20 md:px-8 md:py-28">
+      <div className="mx-auto max-w-6xl space-y-10">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="space-y-4">
+            <div className="max-w-[360px] fps-jitter">
+              <Image src="/wordmarks/projects.png" alt="Projects wordmark" width={720} height={220} className="h-auto w-full" />
+            </div>
+            <p className="max-w-xl text-sm leading-6 md:text-base" style={{ color: "var(--ink-soft)" }}>
+              A selection of work across product design, frontend systems, AI-assisted tooling, and projects that
+              try not to look like everybody else's.
+            </p>
+          </div>
         </div>
-      )}
+
+        <div className="grid gap-5 md:grid-cols-2">
+          {projects.map((project) => (
+            <ProjectCard key={project.slug} project={project} />
+          ))}
+        </div>
+      </div>
     </section>
-  )
+  );
 }
 ```
 
-- [ ] **Step 3: Add `<Projects />` to `app/page.tsx`**
+- [x] **Step 3: Add `Projects` below `About`**
 
 ```tsx
-import Hero from '@/components/Hero'
-import About from '@/components/About'
-import Projects from '@/components/Projects'
+import About from "@/components/About";
+import Hero from "@/components/Hero";
+import Projects from "@/components/Projects";
 
 export default function Home() {
   return (
@@ -388,91 +768,92 @@ export default function Home() {
       <About />
       <Projects />
     </>
-  )
+  );
 }
 ```
 
-- [ ] **Step 4: Verify in browser**
+- [x] **Step 4: Verify project rendering**
 
-Scroll to the Projects section — the sample project card should appear with tech tags and links.
-
-- [ ] **Step 5: Commit**
+Run:
 
 ```bash
-git add components/ProjectCard.tsx components/Projects.tsx app/page.tsx && \
-git commit -m "feat: add Projects section with MDX-powered project cards"
+npm run dev
+```
+
+Expected: the Projects section renders one real project card with tech items and links.
+
+- [x] **Step 5: Commit**
+
+```bash
+git add app/page.tsx components/ProjectCard.tsx components/Projects.tsx
+git commit -m "feat: add handmade projects section"
 ```
 
 ---
 
-### Task 5: Contact section
+### Task 7: Build the Contact section and finish page composition
 
 **Files:**
 - Create: `components/Contact.tsx`
 - Modify: `app/page.tsx`
 
 **Interfaces:**
-- Produces: `<Contact />` — social links and email CTA
+- Produces: a final CTA that closes the page in the same handmade system without overpowering the projects
 
-- [ ] **Step 1: Create `components/Contact.tsx`**
+- [x] **Step 1: Create `components/Contact.tsx`**
 
 ```tsx
 const links = [
-  { label: 'GitHub', href: 'https://github.com/amitelgabsy' },
-  { label: 'LinkedIn', href: 'https://linkedin.com/in/amitelgabsy' },
-  { label: 'Email', href: 'mailto:amit.elgabsy@gmail.com' },
-]
+  { label: "GitHub", href: "https://github.com/amitelgabsy" },
+  { label: "LinkedIn", href: "https://linkedin.com/in/amitelgabsy" },
+  { label: "Email", href: "mailto:amit.elgabsy@gmail.com" },
+];
 
 export default function Contact() {
   return (
-    <section id="contact" className="py-32 px-6 text-center max-w-3xl mx-auto">
-      <p className="text-xs tracking-[0.3em] uppercase mb-4" style={{ color: 'var(--accent)' }}>
-        Get In Touch
-      </p>
-      <h2
-        className="text-4xl md:text-6xl font-black mb-6"
-        style={{ fontFamily: 'var(--font-display)', color: 'var(--text)' }}
-      >
-        Let's Build
-        <br />
-        <span style={{ color: 'var(--accent)' }}>Something.</span>
-      </h2>
-      <p className="text-lg mb-12" style={{ color: 'var(--text-muted)' }}>
-        Open to freelance projects, collaborations, and full-time roles.
-      </p>
-      <div className="flex flex-wrap justify-center gap-4">
-        {links.map(l => (
-          <a
-            key={l.label}
-            href={l.href}
-            target={l.href.startsWith('http') ? '_blank' : undefined}
-            rel="noopener noreferrer"
-            className="px-8 py-4 rounded-full font-semibold transition-all hover:scale-105 active:scale-95"
-            style={
-              l.label === 'Email'
-                ? { background: 'var(--accent)', color: '#000' }
-                : { border: '1px solid rgba(255,255,255,0.15)', color: 'var(--text)' }
-            }
-          >
-            {l.label}
-          </a>
-        ))}
+    <section id="contact" className="px-4 pb-24 pt-12 md:px-8 md:pb-32">
+      <div className="mx-auto max-w-4xl border px-6 py-8 paper-panel md:px-8 md:py-10">
+        <div className="space-y-5">
+          <h2 className="sketch-divider text-3xl font-semibold tracking-[-0.03em] md:text-5xl">
+            Contact
+          </h2>
+          <p className="max-w-2xl text-sm leading-6 md:text-base" style={{ color: "var(--ink-soft)" }}>
+            Open to product work, creative engineering, collaborations, and roles where design taste matters as
+            much as implementation speed.
+          </p>
+
+          <div className="flex flex-wrap gap-3 pt-2">
+            {links.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                target={link.href.startsWith("http") ? "_blank" : undefined}
+                rel={link.href.startsWith("http") ? "noreferrer" : undefined}
+                className="border px-4 py-3 text-sm transition-opacity duration-150 hover:opacity-70"
+                style={{
+                  color: link.label === "Email" ? "#231a13" : "var(--ink)",
+                  background: link.label === "Email" ? "var(--water-beige)" : "rgba(255,250,243,0.75)",
+                  borderColor: "rgba(95,81,69,0.18)",
+                }}
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
-      <p className="mt-20 text-xs" style={{ color: 'var(--text-muted)' }}>
-        © {new Date().getFullYear()} Amit Elgabsy. Built with Next.js & bold ideas.
-      </p>
     </section>
-  )
+  );
 }
 ```
 
-- [ ] **Step 2: Add `<Contact />` to `app/page.tsx`**
+- [x] **Step 2: Add `Contact` below `Projects`**
 
 ```tsx
-import Hero from '@/components/Hero'
-import About from '@/components/About'
-import Projects from '@/components/Projects'
-import Contact from '@/components/Contact'
+import About from "@/components/About";
+import Contact from "@/components/Contact";
+import Hero from "@/components/Hero";
+import Projects from "@/components/Projects";
 
 export default function Home() {
   return (
@@ -482,25 +863,64 @@ export default function Home() {
       <Projects />
       <Contact />
     </>
-  )
+  );
 }
 ```
 
-- [ ] **Step 3: Verify in browser**
+- [x] **Step 3: Run the full verification set**
 
-Scroll to the bottom — Contact section with GitHub, LinkedIn, and Email buttons should appear.
-
-- [ ] **Step 4: Run build to verify no errors**
+Run:
 
 ```bash
+npx tsc --noEmit
+npm run lint
 npm run build
 ```
 
-Expected: Build succeeds with no TypeScript or lint errors.
+Expected:
+- no TypeScript errors
+- lint passes
+- build succeeds
 
-- [ ] **Step 5: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
-git add components/Contact.tsx app/page.tsx && \
-git commit -m "feat: add Contact section — phase 3 complete"
+git add app/page.tsx components/Contact.tsx
+git commit -m "feat: complete phase 3 landing page composition"
+```
+
+---
+
+### Task 8: Refresh docs to match the implemented direction
+
+**Files:**
+- Modify: `README.md`
+- Modify: `docs/superpowers/plans/2026-06-29-phase-3-core-sections.md`
+- Modify: `CODEX.md`
+
+**Interfaces:**
+- Produces: repo docs that reflect the real Phase 3 implementation and its handmade paper direction
+
+- [x] **Step 1: Mark the Phase 3 plan checkboxes complete**
+
+Update each `- [ ]` in this plan to `- [x]` for the implemented steps only.
+
+- [x] **Step 2: Add the completed Phase 3 write-up to `README.md`**
+
+Include:
+- the white-paper art direction
+- use of real wordmark assets
+- low-FPS motion approach
+- the sample project content
+- verification commands run
+
+- [x] **Step 3: Update `CODEX.md` handoff**
+
+Move the current phase forward and summarize the completed Phase 3 structure.
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add README.md docs/superpowers/plans/2026-06-29-phase-3-core-sections.md CODEX.md
+git commit -m "docs: record completed phase 3 work"
 ```

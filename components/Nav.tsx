@@ -15,58 +15,68 @@ export default function Nav() {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
-      style={{ background: "rgba(10,10,10,0.8)", backdropFilter: "blur(12px)" }}
-    >
-      <Link
-        href="/"
-        className="text-lg font-bold"
-        style={{ color: "var(--accent)", fontFamily: "var(--font-display)" }}
+    <nav className="fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-8">
+      <div
+        className="mx-auto flex max-w-6xl items-center justify-between border px-4 py-3 md:px-5"
+        style={{
+          background: "rgba(255,250,243,0.86)",
+          borderColor: "rgba(95,81,69,0.18)",
+          boxShadow: "0 2px 10px rgba(90,72,54,0.08)",
+          backdropFilter: "blur(8px)",
+        }}
       >
-        AE
-      </Link>
+        <Link href="/" className="text-sm font-semibold tracking-[0.08em]" style={{ color: "var(--ink)" }}>
+          AMIT ELGABSY
+        </Link>
 
-      <ul className="hidden list-none gap-8 md:flex">
-        {links.map((link) => (
-          <li key={link.href}>
-            <Link
-              href={link.href}
-              className="text-sm transition-colors hover:text-[var(--accent)]"
-              style={{ color: "var(--text-muted)" }}
-            >
-              {link.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-
-      <button
-        className="text-[var(--accent)] md:hidden"
-        onClick={() => setOpen((value) => !value)}
-        aria-label="Menu"
-      >
-        {open ? "X" : "☰"}
-      </button>
-
-      {open ? (
-        <ul
-          className="absolute top-full left-0 right-0 flex list-none flex-col gap-4 p-6 md:hidden"
-          style={{ background: "var(--surface)" }}
-        >
+        <ul className="hidden items-center gap-6 md:flex">
           {links.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}
-                onClick={() => setOpen(false)}
-                className="text-lg"
-                style={{ color: "var(--text)" }}
+                className="text-sm transition-opacity duration-150 hover:opacity-65"
+                style={{ color: "var(--ink-soft)" }}
               >
                 {link.label}
               </Link>
             </li>
           ))}
         </ul>
+
+        <button
+          type="button"
+          className="text-sm font-medium md:hidden"
+          aria-label="Toggle navigation"
+          onClick={() => setOpen((value) => !value)}
+          style={{ color: "var(--ink)" }}
+        >
+          {open ? "Close" : "Menu"}
+        </button>
+      </div>
+
+      {open ? (
+        <div
+          className="mx-auto mt-2 max-w-6xl border px-4 py-3 md:hidden"
+          style={{
+            background: "rgba(255,250,243,0.95)",
+            borderColor: "rgba(95,81,69,0.18)",
+          }}
+        >
+          <ul className="flex flex-col gap-3">
+            {links.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className="block text-sm"
+                  style={{ color: "var(--ink-soft)" }}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       ) : null}
     </nav>
   );

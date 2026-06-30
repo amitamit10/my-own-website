@@ -1,7 +1,7 @@
 # Codex Handoff — Personal Portfolio Website
 
 **Date:** 2026-06-29  
-**Current phase: Phase 3 — Core Sections**
+**Current phase: Phase 4 — GitHub Activity**
 
 ---
 
@@ -40,51 +40,28 @@ Custom water-photography font for display headings (assembled from letter PNGs i
 - Vercel project `personal-website` is linked and deployed.
 - Because this workspace path contains `!`, Next 15's Webpack build was not viable here. Phase 2 was completed on **Next.js 16.2.9 (Turbopack)** instead.
 
-### Phase 3 — START HERE
-Build the core sections on top of the current scaffold.
+### Phase 3 — DONE
+- `app/page.tsx` now composes `Hero`, `About`, `Projects`, and `Contact`.
+- `app/globals.css` and `components/Nav.tsx` were retuned from the earlier dark placeholder direction into the approved white-paper, warm-water palette.
+- The hero uses the real water-photography wordmark asset from `public/wordmarks/amit.png` and intentionally does not use a profile picture.
+- `components/ProjectCard.tsx`, `components/Projects.tsx`, and `content/projects/personal-website.mdx` now provide the first real MDX-backed project section.
+- `components/Contact.tsx` closes the page with the same handmade system instead of switching visual styles.
+- Verification completed with:
+  - `npx tsx lib/__test-content.ts`
+  - `npx tsc --noEmit`
+  - `npm run lint`
+  - `npm run build`
+  - `npm run dev`
+  - `curl -I http://localhost:3000`
+
+### Phase 4 — START HERE
+Build the GitHub activity section on top of the completed Phase 3 landing page.
 
 ---
 
-## Phase 2 tasks (in order)
+## Phase 4 tasks (in order)
 
-Read the full plan at `docs/superpowers/plans/2026-06-29-phase-2-site-foundation.md`. Tick `- [ ]` checkboxes as you complete each step. Below is a summary:
-
-### Task 1 — Scaffold Next.js
-```bash
-npx create-next-app@latest . \
-  --typescript \
-  --tailwind \
-  --app \
-  --no-src-dir \
-  --import-alias "@/*" \
-  --yes
-```
-Verify `npm run dev` starts on port 3000.
-
-### Task 2 — Configure Tailwind and global styles
-Replace `app/globals.css` with the design token CSS defined in the plan.  
-Key tokens: `--bg: #0a0a0a`, `--accent: #00d4ff`, `--font-display`, `--font-body`.
-
-### Task 3 — Custom font setup
-- copy the real generated font from `tools/font-builder/output/water.woff2` into `public/fonts/water.woff2`
-- Update `app/layout.tsx` to load the font via `next/font/local` into `--font-water` CSS variable
-- `npm install geist`
-
-### Task 4 — MDX content utilities
-- `npm install gray-matter next-mdx-remote`
-- Create `lib/content.ts` with `getProjects()`, `getProjectBySlug()`, `getBlogPosts()`, `getBlogPostBySlug()`
-- Create `content/projects/.gitkeep` and `content/blog/.gitkeep`
-
-### Task 5 — Basic layout shell
-- Create `components/Nav.tsx` — fixed nav bar with blur, cyan accent, mobile hamburger
-- Update `app/layout.tsx` to wrap children with `<Nav />`
-- Replace `app/page.tsx` with placeholder text
-
-### Task 6 — Vercel preview deployment
-```bash
-vercel
-```
-Link to or create a project named `personal-website`. Verify the preview URL loads.
+Read the full plan at `docs/superpowers/plans/2026-06-29-phase-4-github-activity.md`. Tick `- [ ]` checkboxes as you complete each step. The Phase 3 landing page is now the baseline, so the next work should layer the GitHub activity section into the existing white-paper composition instead of replacing it.
 
 ---
 

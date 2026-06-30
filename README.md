@@ -105,7 +105,7 @@ Validation confirmed:
 
 ## Phase 2 — Site Foundation ✅
 
-**Goal:** Scaffold the Next.js portfolio site — Tailwind, MDX utilities, custom font setup, nav bar, Vercel preview deploy.
+**Goal:** Scaffold the Next.js portfolio site — Tailwind, MDX utilities, custom font setup, nav bar, and a live Vercel deployment.
 
 **Built with:** Codex
 
@@ -117,7 +117,7 @@ Validation confirmed:
 - Copied the current built font from `tools/font-builder/output/water.woff2` into `public/fonts/water.woff2` and documented that handoff in `public/fonts/README.md`.
 - Added `lib/content.ts` plus `content/projects/.gitkeep` and `content/blog/.gitkeep` for the later MDX-based portfolio/blog phases.
 - Added a fixed `components/Nav.tsx` shell and replaced the homepage with the simple Phase 2 placeholder.
-- Linked the repo to Vercel project `personal-website` and deployed it successfully.
+- Linked the repo to Vercel project `personal-website` and deployed it successfully to Vercel. The current deployment target is `production` and the deployment status is `Ready`.
 
 ### Important deviations from the written plan
 
@@ -147,23 +147,57 @@ vercel --yes --scope amits-projects-79cd529f
 - `npm run dev` started successfully on `http://localhost:3000`
 - `curl -I http://localhost:3000` returned `200 OK`
 - Vercel deployment completed successfully
+- `vercel inspect personal-website-7qv3f9xec-amits-projects-79cd529f.vercel.app --scope amits-projects-79cd529f` reported `status: Ready`
 
 ### Vercel URLs
 
 - Deployment URL: `https://personal-website-7qv3f9xec-amits-projects-79cd529f.vercel.app`
 - Friendly alias: `https://personal-website-pink-six-96.vercel.app`
+- Additional aliases:
+  - `https://personal-website-amits-projects-79cd529f.vercel.app`
+  - `https://personal-website-amitelgabsy-7297-amits-projects-79cd529f.vercel.app`
 
 Note: the Vercel deployment is currently behind the team's deployment protection / SSO, so anonymous `curl` requests redirect through Vercel auth.
 
 ---
 
-## Phase 3 — Core Sections
+## Phase 3 — Core Sections ✅
 
 **Goal:** Hero, About/Strengths, Projects grid, Contact section.
 
-**Built with:** TBD
+**Built with:** Codex
 
-> To be filled in after Phase 3 is complete.
+### What was built
+
+- Replaced the dark placeholder direction with a white-paper landing page using warm ink, beige water tones, and lightweight handmade framing.
+- Built a wordmark-led hero with the real photographed-water `amit.png` asset, low-FPS motion helpers, and no profile photo.
+- Added the editorial `About` section, a real MDX-backed `Projects` section, and a matching `Contact` close.
+- Added `content/projects/personal-website.mdx` as the first real project entry and rendered it through `lib/content.ts`.
+- Restyled the nav to fit the calmer handmade composition while keeping it readable on mobile and desktop.
+
+### Commands run
+
+```bash
+npx tsx lib/__test-content.ts
+npx tsc --noEmit
+npm run lint
+npm run build
+npm run dev
+curl -I http://localhost:3000
+```
+
+### Verification
+
+- `npx tsx lib/__test-content.ts` reported `Projects found: 1` and `First project: Personal Portfolio Website`
+- `npx tsc --noEmit` passed
+- `npm run lint` passed
+- `npm run build` passed
+- `curl -I http://localhost:3000` returned `200 OK`
+
+### Notes
+
+- The landing page keeps the handmade direction readable by using the real water texture for key wordmarks and a cleaner editorial treatment for the supporting sections.
+- The current hero intentionally avoids a profile picture and uses composition, motion, and type instead.
 
 ---
 
