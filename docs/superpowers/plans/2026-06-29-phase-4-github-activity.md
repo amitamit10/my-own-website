@@ -6,7 +6,7 @@
 
 **Architecture:** A server-side `lib/github.ts` utility fetches data from the GitHub API at request time (no client-side calls). The `<GitHubActivity />` component is a Server Component that calls the utility and renders a contribution heatmap grid and a list of recent repos. A `GITHUB_USERNAME` environment variable drives the username.
 
-**Tech Stack:** Next.js 15 App Router (Server Components), GitHub REST API v3 (public endpoints, no auth required for public data), TypeScript
+**Tech Stack:** Next.js 16 App Router (Server Components), GitHub REST API v3 (public endpoints, no auth required for public data), TypeScript
 
 ## Global Constraints
 - No GitHub OAuth or personal access token required (public API only)
@@ -25,19 +25,19 @@
 **Interfaces:**
 - Produces: `process.env.GITHUB_USERNAME` available at runtime
 
-- [ ] **Step 1: Create `.env.local`**
+- [x] **Step 1: Create `.env.local`**
 
 ```bash
-echo "GITHUB_USERNAME=amitelgabsy" >> .env.local
+echo "GITHUB_USERNAME=amitamit10" >> .env.local
 ```
 
-- [ ] **Step 2: Create `.env.local.example`**
+- [x] **Step 2: Create `.env.local.example`**
 
 ```
-GITHUB_USERNAME=your-github-username
+GITHUB_USERNAME=amitamit10
 ```
 
-- [ ] **Step 3: Ensure `.env.local` is gitignored**
+- [x] **Step 3: Ensure `.env.local` is gitignored**
 
 Verify `.gitignore` already includes `.env.local` (Next.js scaffold adds this by default).
 
@@ -47,7 +47,7 @@ grep "env.local" .gitignore
 
 Expected: `.env.local` is listed.
 
-- [ ] **Step 4: Commit example file**
+- [x] **Step 4: Commit example file**
 
 ```bash
 git add .env.local.example && \
@@ -67,7 +67,7 @@ git commit -m "chore: add env example with GITHUB_USERNAME"
   - `getContributionWeeks(username: string): Promise<ContributionWeek[]>` — 52 weeks of daily contribution counts via scraping SVG from github.com
   - Types: `GitHubRepo`, `ContributionDay`, `ContributionWeek`
 
-- [ ] **Step 1: Create `lib/github.ts`**
+- [x] **Step 1: Create `lib/github.ts`**
 
 ```ts
 export type GitHubRepo = {
@@ -131,14 +131,14 @@ export async function getContributionWeeks(username: string): Promise<Contributi
 }
 ```
 
-- [ ] **Step 2: Verify API calls work**
+- [x] **Step 2: Verify API calls work**
 
 Create a temporary test file `lib/__test-github.ts`:
 
 ```ts
 import { getGitHubRepos, getContributionWeeks } from './github'
 
-const username = 'amitelgabsy'
+const username = 'amitamit10'
 const repos = await getGitHubRepos(username)
 console.log('Repos found:', repos.length)
 console.log('First repo:', repos[0]?.name)
@@ -168,7 +168,7 @@ Delete the test file:
 rm lib/__test-github.ts
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add lib/github.ts && \
@@ -188,7 +188,7 @@ git commit -m "feat: add GitHub API utility for repos and contribution weeks"
 - Consumes: `process.env.GITHUB_USERNAME`
 - Produces: `<GitHubActivity />` — contribution heatmap + recent repos grid
 
-- [ ] **Step 1: Create `components/GitHubActivity.tsx`**
+- [x] **Step 1: Create `components/GitHubActivity.tsx`**
 
 ```tsx
 import { getGitHubRepos, getContributionWeeks } from '@/lib/github'
@@ -202,7 +202,7 @@ const LEVEL_COLORS: Record<number, string> = {
 }
 
 export default async function GitHubActivity() {
-  const username = process.env.GITHUB_USERNAME ?? 'amitelgabsy'
+  const username = process.env.GITHUB_USERNAME ?? 'amitamit10'
   const [repos, weeks] = await Promise.all([
     getGitHubRepos(username),
     getContributionWeeks(username),
@@ -276,7 +276,7 @@ export default async function GitHubActivity() {
 }
 ```
 
-- [ ] **Step 2: Add `<GitHubActivity />` to `app/page.tsx`**
+- [x] **Step 2: Add `<GitHubActivity />` to `app/page.tsx`**
 
 ```tsx
 import Hero from '@/components/Hero'
@@ -298,7 +298,7 @@ export default function Home() {
 }
 ```
 
-- [ ] **Step 3: Verify in browser**
+- [x] **Step 3: Verify in browser**
 
 ```bash
 npm run dev
@@ -306,7 +306,7 @@ npm run dev
 
 Scroll to the GitHub section — you should see the contribution heatmap grid and repo cards. If the GitHub username has no public repos yet, an empty grid is acceptable.
 
-- [ ] **Step 4: Run build**
+- [x] **Step 4: Run build**
 
 ```bash
 npm run build
@@ -314,7 +314,7 @@ npm run build
 
 Expected: builds cleanly, no TypeScript errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add components/GitHubActivity.tsx app/page.tsx && \

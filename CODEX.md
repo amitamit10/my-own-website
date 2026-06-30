@@ -1,7 +1,7 @@
 # Codex Handoff — Personal Portfolio Website
 
 **Date:** 2026-06-29  
-**Current phase: Phase 4 — GitHub Activity**
+**Current phase: Phase 5 — AI Blog Generation**
 
 ---
 
@@ -54,14 +54,28 @@ Custom water-photography font for display headings (assembled from letter PNGs i
   - `npm run dev`
   - `curl -I http://localhost:3000`
 
-### Phase 4 — START HERE
-Build the GitHub activity section on top of the completed Phase 3 landing page.
+### Phase 4 — DONE
+- `lib/github.ts` now fetches recent public repos from the GitHub REST API and parses the public contributions page into a real 53-week grid.
+- `components/GitHubActivity.tsx` adds the GitHub section in the same paper / water-font / low-FPS visual language as the rest of the site.
+- `public/wordmarks/github.png` was generated from the photographed glyph system for the section title.
+- `.env.local.example` documents `GITHUB_USERNAME`, and the local `.env.local` uses the real account name `amitamit10`.
+- The previous placeholder GitHub username was corrected in the live site content and links.
+- Verification completed with:
+  - `npx tsx lib/__test-github.ts`
+  - `npx tsc --noEmit`
+  - `npm run lint`
+  - `npm run build`
+  - `npm run dev`
+  - `curl -s http://localhost:3000 | rg "github.com/amitamit10|Contribution rhythm|Recent repositories"`
+
+### Phase 5 — START HERE
+Build the AI blog generation flow on top of the completed landing page and GitHub section.
 
 ---
 
-## Phase 4 tasks (in order)
+## Phase 5 tasks (in order)
 
-Read the full plan at `docs/superpowers/plans/2026-06-29-phase-4-github-activity.md`. Tick `- [ ]` checkboxes as you complete each step. The Phase 3 landing page is now the baseline, so the next work should layer the GitHub activity section into the existing white-paper composition instead of replacing it.
+Read the full plan at `docs/superpowers/plans/2026-06-29-phase-5-ai-blog.md`. The site baseline now includes the completed handmade landing page plus the live GitHub activity section, so the next work should add the blog generation system without breaking that visual language.
 
 ---
 

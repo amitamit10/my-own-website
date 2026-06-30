@@ -201,13 +201,39 @@ curl -I http://localhost:3000
 
 ---
 
-## Phase 4 — GitHub Activity
+## Phase 4 — GitHub Activity ✅
 
 **Goal:** Live GitHub contribution graph and recent repo cards via GitHub REST API.
 
-**Built with:** TBD
+**Built with:** Codex
 
-> To be filled in after Phase 4 is complete.
+### What was built
+
+- Added `lib/github.ts` for server-side GitHub data fetching with one-hour revalidation.
+- Parsed the live GitHub contribution graph HTML into a real 53-week contribution grid.
+- Added a handmade `GitHub` section with a real water wordmark, paper-framed contribution heatmap, and recent public repositories.
+- Corrected the site’s GitHub username references from the old placeholder to the real account `amitamit10`.
+- Added `.env.local.example` and a local `.env.local` using `GITHUB_USERNAME=amitamit10`.
+
+### Commands run
+
+```bash
+python3 tools/font-builder/compose_wordmark.py GITHUB --out public/wordmarks/github.png
+npx tsx lib/__test-github.ts
+npx tsc --noEmit
+npm run lint
+npm run build
+npm run dev
+curl -s http://localhost:3000 | rg "github.com/amitamit10|Contribution rhythm|Recent repositories"
+```
+
+### Verification
+
+- `npx tsx lib/__test-github.ts` reported `Repos found: 6`, `First repo: my-own-website`, `Total contributions: 552`, and `Weeks parsed: 53`
+- `npx tsc --noEmit` passed
+- `npm run lint` passed
+- `npm run build` passed
+- The dev HTML includes the real `#github` section, GitHub profile link, live contribution data, and recent repo content
 
 ---
 

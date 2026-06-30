@@ -3,7 +3,7 @@ import Image from "next/image";
 import InkDoodle from "./InkDoodle";
 
 const links = [
-  { label: "GitHub", href: "https://github.com/amitelgabsy" },
+  { label: "GitHub", href: "https://github.com/amitamit10" },
   { label: "LinkedIn", href: "https://linkedin.com/in/amitelgabsy" },
   { label: "Email", href: "mailto:amit.elgabsy@gmail.com" },
 ];
