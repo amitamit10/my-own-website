@@ -1,6 +1,7 @@
 import { getProjects } from "@/lib/content";
 import Image from "next/image";
 
+import InkDoodle from "./InkDoodle";
 import ProjectCard from "./ProjectCard";
 
 export default async function Projects() {
@@ -25,8 +26,20 @@ export default async function Projects() {
               try not to look like everybody else&apos;s.
             </p>
           </div>
+          <div
+            className="max-w-xs rotate-[3deg] border px-4 py-4 fps-tilt"
+            style={{
+              background: "rgba(255,250,243,0.72)",
+              borderColor: "rgba(95,81,69,0.14)",
+            }}
+          >
+            <p className="text-sm leading-6" style={{ color: "var(--water-shadow)" }}>
+              Each project should read like both a working product and a clear point of view.
+            </p>
+          </div>
         </div>
 
+        <InkDoodle className="ml-auto w-44 rotate-[-7deg] fps-drift" variant="arrow" />
         <div className="grid gap-5 md:grid-cols-2">
           {projects.map((project) => (
             <ProjectCard key={project.slug} project={project} />

@@ -3,10 +3,13 @@ import type { Project } from "@/lib/content";
 export default function ProjectCard({ project }: { project: Project }) {
   return (
     <article
-      className="flex h-full flex-col gap-5 border px-5 py-5 paper-panel fps-hover md:px-6 md:py-6"
+      className="rough-frame flex h-full flex-col gap-5 border px-5 py-5 paper-panel fps-hover md:px-6 md:py-6"
       style={{ borderColor: "rgba(95,81,69,0.16)" }}
     >
       <div className="space-y-3">
+        <p className="text-xs tracking-[0.08em]" style={{ color: "var(--water-shadow)" }}>
+          {project.date}
+        </p>
         <h3 className="text-2xl font-semibold tracking-[-0.03em]" style={{ color: "var(--ink)" }}>
           {project.title}
         </h3>
@@ -34,7 +37,7 @@ export default function ProjectCard({ project }: { project: Project }) {
       <ul className="space-y-2">
         {project.highlights.slice(0, 3).map((highlight) => (
           <li key={highlight} className="text-sm leading-6" style={{ color: "var(--ink-soft)" }}>
-            {highlight}
+            - {highlight}
           </li>
         ))}
       </ul>

@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import InkDoodle from "./InkDoodle";
+
 export default function Hero() {
   return (
     <section className="relative overflow-hidden px-4 pb-16 pt-32 md:px-8 md:pb-24 md:pt-36">
@@ -23,11 +25,14 @@ export default function Hero() {
             </div>
           </div>
 
-          <div className="relative max-w-2xl border px-5 py-5 paper-panel fps-hover md:px-6 md:py-6">
-            <p className="text-base leading-7 md:text-lg" style={{ color: "var(--ink)" }}>
-              I design and build software that feels like somebody actually cared while making it. This site is
-              part portfolio, part artifact, and part proof that code can still have a point of view.
-            </p>
+          <div className="paper-stack relative max-w-2xl px-5 py-5 md:px-6 md:py-6">
+            <div className="rough-frame relative paper-panel fps-hover px-5 py-5 md:px-6 md:py-6">
+              <div className="tape-strip absolute -top-3 left-8 h-8 w-24 rotate-[-6deg] opacity-80" />
+              <p className="text-base leading-7 md:text-lg" style={{ color: "var(--ink)" }}>
+                I design and build software that feels like somebody actually cared while making it. This site is
+                part portfolio, part artifact, and part proof that code can still have a point of view.
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -56,26 +61,29 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="relative min-h-[320px] lg:min-h-[480px]">
+        <div className="relative min-h-[360px] lg:min-h-[500px]">
           <div
             className="absolute left-[8%] top-[6%] h-32 w-32 rounded-full fps-drift"
             style={{ background: "rgba(201,175,133,0.24)" }}
           />
+          <InkDoodle className="absolute left-[4%] top-[2%] w-20 fps-jitter" variant="spark" />
           <div
-            className="absolute right-[8%] top-[18%] h-28 w-40 rotate-[-7deg] border paper-panel fps-jitter"
+            className="absolute right-[8%] top-[14%] h-28 w-40 rotate-[-7deg] border paper-panel fps-jitter"
             style={{ background: "rgba(255,250,243,0.8)", borderColor: "rgba(95,81,69,0.15)" }}
           />
           <div
-            className="absolute left-[18%] top-[32%] w-[68%] rotate-[-3deg] border px-4 py-4 paper-panel fps-hover"
-            style={{ borderColor: "rgba(95,81,69,0.18)" }}
+            className="paper-stack absolute left-[16%] top-[28%] w-[70%] rotate-[-3deg] px-4 py-4 fps-hover"
           >
-            <p className="text-sm leading-6" style={{ color: "var(--ink-soft)" }}>
-              Building portfolio systems, AI-assisted flows, creative tooling, and product surfaces that do not
-              look like copied startup templates.
-            </p>
+            <div className="rough-frame paper-panel px-4 py-4" style={{ borderColor: "rgba(95,81,69,0.18)" }}>
+              <div className="tape-strip absolute -top-3 right-8 h-8 w-20 rotate-[7deg] opacity-75" />
+              <p className="text-sm leading-6" style={{ color: "var(--ink-soft)" }}>
+                Building portfolio systems, AI-assisted flows, creative tooling, and product surfaces that do not
+                look like copied startup templates.
+              </p>
+            </div>
           </div>
           <div
-            className="absolute bottom-[12%] right-[10%] w-[58%] rotate-[2deg] border px-4 py-4 fps-jitter"
+            className="absolute bottom-[14%] right-[10%] w-[58%] rotate-[2deg] border px-4 py-4 fps-tilt"
             style={{
               background: "rgba(231,220,205,0.7)",
               borderColor: "rgba(95,81,69,0.14)",
@@ -85,6 +93,16 @@ export default function Hero() {
               Handmade web presence
             </p>
           </div>
+          <div
+            className="absolute bottom-[4%] left-[10%] w-[46%] rotate-[4deg] px-4 py-4 fps-jitter"
+            style={{ background: "rgba(255,250,243,0.76)", border: "1px solid rgba(95,81,69,0.16)" }}
+          >
+            <p className="text-sm leading-6" style={{ color: "var(--water-shadow)" }}>
+              Built from photographed water letters, then composed like paper scraps on a desk.
+            </p>
+          </div>
+          <InkDoodle className="absolute right-[2%] top-[46%] w-28 fps-drift" variant="loop" />
+          <InkDoodle className="absolute left-[30%] bottom-[2%] w-44 rotate-[6deg] fps-jitter" variant="arrow" />
         </div>
       </div>
     </section>
