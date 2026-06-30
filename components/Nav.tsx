@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const links = [
@@ -13,6 +14,15 @@ const links = [
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  const resolveHref = (href: string) => {
+    if (!href.startsWith("#")) {
+      return href;
+    }
+
+    return pathname === "/" ? href : `/${href}`;
+  };
 
   return (
     <nav className="fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-8">
@@ -33,7 +43,7 @@ export default function Nav() {
           {links.map((link) => (
             <li key={link.href}>
               <Link
-                href={link.href}
+                href={resolveHref(link.href)}
                 className="text-sm transition-opacity duration-150 hover:opacity-65"
                 style={{ color: "var(--ink-soft)" }}
               >
@@ -66,7 +76,7 @@ export default function Nav() {
             {links.map((link) => (
               <li key={link.href}>
                 <Link
-                  href={link.href}
+                  href={resolveHref(link.href)}
                   onClick={() => setOpen(false)}
                   className="block text-sm"
                   style={{ color: "var(--ink-soft)" }}
