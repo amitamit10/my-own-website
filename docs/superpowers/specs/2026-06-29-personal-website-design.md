@@ -7,13 +7,15 @@
 
 ## Overview
 
-A bold, creative personal portfolio website built with Next.js and deployed on Vercel. The site showcases Amit's work, strengths, and GitHub activity to employers, clients, and fellow developers. A custom water-photography font is used for display headings. When a new project is published, a Groq-powered AI model auto-generates a blog post about it.
+A handmade-feeling personal portfolio website built with Next.js and deployed on Vercel. The site's job is to introduce Amit clearly, make his projects feel memorable, and prove taste as well as technical ability. A custom water-photography font is the visual anchor, but the content still needs to read like a real portfolio first. When a new project is published, a Groq-powered AI model auto-generates a blog post about it.
+
+The page should feel like a designed paper composition assembled from water letters, rough dividers, taped notes, and stop-motion fragments rather than like a default portfolio template.
 
 ---
 
 ## Sections
 
-1. **Hero** — Full-screen intro with name rendered in the custom water font, a punchy tagline, and a CTA
+1. **Hero** — Full-screen, wordmark-led intro with Amit's name rendered from the custom water assets, a punchy tagline, and a CTA
 2. **About / Strengths** — Short bio, key skills, and what makes Amit stand out
 3. **Projects** — Cards showcasing work, each linked to an auto-generated blog post
 4. **GitHub Activity** — Live GitHub contribution graph and recent repos via GitHub API
@@ -36,6 +38,14 @@ A bold, creative personal portfolio website built with Next.js and deployed on V
 
 ---
 
+## Subject, Audience, and Single Job
+
+- **Subject:** Amit Elgabsy's personal body of work as a developer and builder
+- **Audience:** Employers, collaborators, and clients who need to understand both the quality of the work and the personality behind it
+- **Single job of the page:** Make people remember Amit quickly, then give them a clear path into his projects
+
+---
+
 ## Custom Font Pipeline
 
 A dedicated tool (separate mini-app in this repo under `tools/font-maker/`) that:
@@ -44,9 +54,9 @@ A dedicated tool (separate mini-app in this repo under `tools/font-maker/`) that
 2. **Letter capture** — User photographs water forming each letter (A–Z, 0–9, punctuation as needed). Photos upload directly to the tool.
 3. **Background removal** — Each photo is processed automatically (remove.bg API or local `rembg` Python library) to isolate the water letterform on a transparent background.
 4. **Review & save** — Processed images are saved to `tools/font-maker/letters/` as PNGs, one per character.
-5. **Font assembly** — Letters are manually traced in FontForge or Glyphs and exported as `public/fonts/water.woff2`.
+5. **Font assembly** — Cleaned PNGs are processed by the local builder in `tools/font-builder/`, which exports `water.ttf`, `water.woff2`, and image-based wordmarks built from the photographed glyphs.
 
-The font is used only for display headings (hero name, section titles). Body text uses a system or Google font.
+The font system is used primarily for display moments (hero name, section titles, special labels). Body text stays readable with a clean sans-serif companion face.
 
 ---
 
@@ -72,11 +82,59 @@ content/
 
 ## Design Direction
 
-- **Background:** Near-black (`#0a0a0a`)
-- **Accent:** Electric or neon color (TBD during implementation — likely blue or cyan to complement water font)
-- **Typography:** Custom water font for H1/H2 display headings; clean sans-serif (Inter or Geist) for body
-- **Motion:** Subtle scroll animations, cursor effects, particle or ripple effects to reinforce the water theme
-- **Layout:** Full-bleed sections, bold typography, generous whitespace
+### Core visual choice
+
+The site should not use the earlier dark/cyan portfolio direction. The approved direction is **white paper + water-font palette + handmade stop-motion composition**.
+
+### Palette
+
+Colors should be sampled from the actual water glyphs and supporting assets rather than invented from generic UI defaults.
+
+- **Paper:** warm off-white / watercolor paper base
+- **Water beige:** the main headline and accent tone pulled from the real font
+- **Sand / taupe washes:** for section framing, cutout fills, and project surfaces
+- **Wet ink:** the primary text color and sketched line color
+- **Soft gray wash:** for subtle structure and depth
+
+The palette should feel calm, warm, and slightly tactile. No neon cyan-led UI, no purple bias, and no glossy dark SaaS treatment.
+
+### Typography
+
+- **Hero / signature headings:** use the real water-wordmark treatment or image-based wordmarks built from the photographed glyphs
+- **Supporting section titles:** can use the custom water system selectively, but should not reduce readability
+- **Body copy:** clean readable sans-serif for project and bio content
+
+The font is a signature, not a replacement for all content text.
+
+### Layout
+
+- **Hero:** wordmark-led, no portrait or profile picture
+- **Structure:** readable content core with handmade edges
+- **Projects:** the clearest and most credibility-heavy section on the page
+- **Frames:** rough dividers, sketched borders, pinned-paper compositions, taped notes, and cutout shapes can be used around the content
+
+The page should feel composed by hand, but the project information should still scan quickly.
+
+### Motion
+
+Motion should feel intentionally low-FPS, like stop-motion or frame-by-frame collage movement.
+
+- frame-stepped ripple swaps
+- subtle jitter or nudge on hover / reveal
+- slight misregistration of decorative pieces
+- hand-cut movement instead of smooth glossy transitions
+
+Animation is part of the identity system, not just a late polish layer.
+
+### Image use
+
+- Do not use a real profile photo of Amit in the hero
+- Supporting generated imagery is allowed if needed, but should behave like handmade collage material rather than stock illustrations
+- The strongest visual material should come from the actual water font assets wherever possible
+
+### Signature element
+
+The single memorable signature should be the **wordmark-led paper composition**: Amit's water-letter name as the visual anchor, surrounded by rough hand-drawn structure and low-FPS motion fragments.
 
 ---
 
