@@ -8,7 +8,7 @@
 ## What this project is
 
 A personal portfolio website for Amit Elgabsy.  
-Stack: **Next.js 15 App Router + TypeScript + Tailwind CSS v4**, deployed on Vercel.  
+Stack: **Next.js 16 App Router + TypeScript + Tailwind CSS v4**, deployed on Vercel.  
 Content: file-based MDX files in `content/projects/` and `content/blog/`.  
 Custom water-photography font for display headings (assembled from letter PNGs in `tools/font-maker/letters/`).
 
